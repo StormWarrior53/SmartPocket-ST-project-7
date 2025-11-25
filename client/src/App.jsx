@@ -5,12 +5,10 @@ function App() {
 
     return (
         <>
-        <header></header>
 
         <Routes>
             <Route path="/about" element={<About />} />
         </Routes>
-        <footer></footer>
         </>
     )
 }
