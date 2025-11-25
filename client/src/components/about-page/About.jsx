@@ -21,8 +21,6 @@ export default function About() {
                     </div>
                 </div>
 
-
-                {/* What Kids Learn */}
                 <div className="bg-white border border-blue-100 shadow-sm rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8">
                     <div className="flex-1 flex justify-center">
                         <img
@@ -44,10 +42,7 @@ export default function About() {
 
                 </div>
 
-
-                {/* How the App Works */}
                 <div className="bg-white border border-blue-100 shadow-sm rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8">
-                    {/* Text */}
                     <div className="flex-1">
                         <h2 className="text-2xl font-bold text-blue-600">How It Works</h2>
                         <p className="mt-4 text-slate-600">Kids learn by playing mini-games and quizzes designed to teach financial concepts.</p>
@@ -59,7 +54,6 @@ export default function About() {
                         </ol>
                     </div>
 
-                    {/* Image */}
                     <div className="flex-1 flex justify-center md:justify-end">
                         <img
                             src="/images/about4.png"
@@ -69,8 +63,6 @@ export default function About() {
                     </div>
                 </div>
 
-
-                {/* For Parents */}
                 <div className="bg-white border border-blue-100 shadow-sm rounded-2xl p-8 text-center">
                     <h2 className="text-2xl font-bold text-blue-600">For Parents</h2>
                     <ul className="mt-4 space-y-2 text-slate-700">
@@ -81,8 +73,6 @@ export default function About() {
                     </ul>
                 </div>
 
-
-                {/* Why We Created This App */}
                 <div className="bg-white border border-blue-100 shadow-sm rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8">
                     <div className="flex-1 flex justify-center">
                         <img
@@ -99,12 +89,8 @@ export default function About() {
                             challenges and simple explanations that build confidence.
                         </p>
                     </div>
-
-
                 </div>
 
-
-                {/* Contact Info */}
                 <div className="bg-white border border-blue-100 shadow-sm rounded-2xl p-8 text-center">
                     <h2 className="text-2xl font-bold text-blue-600">Contact Us</h2>
                     <p className="mt-4 text-slate-600">Have questions or feedback? We’d love to hear from you!</p>
