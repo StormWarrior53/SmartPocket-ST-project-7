@@ -1,6 +1,8 @@
 package org.example.server.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 
 import java.util.UUID;
@@ -17,13 +19,16 @@ public class Child {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id", nullable = false)
     private Parent parent;
 
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    @Min(7)
+    @Max(24)
     private int age;
 
     @Column(nullable = false)

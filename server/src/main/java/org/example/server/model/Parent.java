@@ -1,6 +1,8 @@
 package org.example.server.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -22,6 +24,8 @@ public class Parent {
     private UUID id;
 
     @Column(unique = true, nullable = false)
+    @Email
+    @NotBlank
     private String email;
 
     @Column(nullable = false)
