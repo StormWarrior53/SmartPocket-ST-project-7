@@ -17,8 +17,8 @@ public class Child {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "parent_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "parent_id", nullable = false)
     private Parent parent;
 
     @Column(nullable = false)
@@ -39,7 +39,7 @@ public class Child {
     @Builder.Default
     private int allowanceMoney = 0;
 
-    // Later relationships:
+    // Future relationships:
     // List<Enrollment> enrollments
     // List<Achievement> achievements
 }
