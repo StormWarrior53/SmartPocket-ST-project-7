@@ -95,7 +95,7 @@ export default function About() {
                         <h2 className="text-2xl font-bold text-blue-600">Why We Built This</h2>
                         <p className="mt-4 text-slate-600 leading-relaxed">
                             Financial literacy is an essential life skill, yet most people learn it too late.
-                            TinyWallets was created to help children understand money early—through fun
+                            SmartPocket was created to help children understand money early—through fun
                             challenges and simple explanations that build confidence.
                         </p>
                     </div>
