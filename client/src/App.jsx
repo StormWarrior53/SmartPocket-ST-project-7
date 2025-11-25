@@ -1,9 +1,15 @@
+import { Route, Routes } from "react-router"
+import About from "./components/about-page/About.jsx"
+
 function App() {
 
     return (
-        <h1 className="text-3xl font-bold underline">
-            Hello world!
-        </h1>
+        <>
+
+        <Routes>
+            <Route path="/about" element={<About />} />
+        </Routes>
+        </>
     )
 }
 
