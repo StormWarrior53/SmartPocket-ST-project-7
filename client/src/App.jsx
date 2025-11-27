@@ -4,6 +4,7 @@ import Footer from "./components/footer/Footer.jsx"
 import Header from "./components/header/Header.jsx"
 import Leaderboard from "./components/leaderboard-page/Leaderboard.jsx"
 import Home from "./components/home-page/Home.jsx"
+import Register from "./components/register-page/Register.jsx"
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/register" element={<Register />} />
             </Routes>
 
             <Footer />
