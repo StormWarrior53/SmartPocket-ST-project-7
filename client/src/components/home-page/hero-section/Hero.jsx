@@ -21,9 +21,11 @@ export default function Hero() {
                         Create an account for your child, track their progress, and watch them earn badges and XP while learning financial skills.
                     </p>
                     <div className="mt-6 flex flex-col sm:flex-row justify-center md:justify-start gap-4">
+                        <Link to="/register">
                         <button className="bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl shadow hover:bg-blue-700 transition">
                             Create Parent Account
                         </button>
+                        </Link>
                         <Link to="/about">
                             <button className="bg-white border border-blue-600 text-blue-600 font-semibold px-6 py-3 rounded-xl shadow hover:bg-blue-50 transition">
                                 Learn About Us
