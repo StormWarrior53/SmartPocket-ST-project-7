@@ -17,7 +17,6 @@ export default function Header() {
                 </div>
 
                 <div className="flex items-center gap-6 text-lg font-medium">
-                    <Link to="/about" className="hover:text-blue-200 transition">About</Link>
                     <Link to="/games" className="hover:text-blue-200 transition">Games</Link>
                     <Link to="/store" className="hover:text-blue-200 transition">Store</Link>
                     <Link to="/leaderboard" className="hover:text-blue-200 transition">Leaderboard</Link>
