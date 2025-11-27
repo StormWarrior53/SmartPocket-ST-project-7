@@ -6,11 +6,11 @@ export default function Footer() {
             <div className="max-w-5xl mx-auto py-8 px-6 sm:px-12 text-center space-y-4">
 
                 <h2 className="text-2xl font-bold text-white">SmartPocket</h2>
-                
+
                 <p className="text-white/90 leading-relaxed">
                     Helping kids learn financial literacy early through fun challenges and games.
                 </p>
-                
+
                 <div className="flex justify-center gap-6 mt-4">
                     <Link to="mailto:support@smartpocket.com" className="text-white hover:underline">
                         Email
@@ -20,6 +20,9 @@ export default function Footer() {
                     </Link>
                     <Link to="/x" className="text-white hover:underline">
                         X
+                    </Link>
+                    <Link to="/about" className="text-white hover:underline">
+                        About us
                     </Link>
                 </div>
 
