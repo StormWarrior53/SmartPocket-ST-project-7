@@ -5,6 +5,7 @@ import Header from "./components/header/Header.jsx"
 import Leaderboard from "./components/leaderboard-page/Leaderboard.jsx"
 import Home from "./components/home-page/Home.jsx"
 import Register from "./components/register-page/Register.jsx"
+import Login from "./components/login-page/Login.jsx"
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
                 <Route path="/about" element={<About />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login />} />
             </Routes>
 
             <Footer />
