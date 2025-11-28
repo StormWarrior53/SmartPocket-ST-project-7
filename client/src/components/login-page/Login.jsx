@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { authApi, ApiError } from "../../services/api";
+import { useUser } from "../../context/UserContext";
 
 const initialValues = {
     email: "",
@@ -27,8 +29,12 @@ function validate(values) {
 }
 
 export default function Login() {
+    const navigate = useNavigate();
+    const { login } = useUser();
     const [data, setData] = useState(initialValues);
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [apiError, setApiError] = useState("");
 
     const changeHandler = (e) => {
         setData((state) => ({
@@ -37,16 +43,36 @@ export default function Login() {
         }));
     };
 
-    const submitAction = () => {
-        const errors = validate(data);
-        setErrors(errors);
+    const submitAction = async (e) => {
+        e.preventDefault();
 
-        if (Object.keys(errors).length > 0) {
+        const validationErrors = validate(data);
+        setErrors(validationErrors);
+        setApiError("");
+
+        if (Object.keys(validationErrors).length > 0) {
             return;
         }
 
-        console.log("Login submitted:", data);
-        // In future: send POST → backend /api/parents/login
+        setLoading(true);
+
+        try {
+            const userData = await authApi.login(data);
+            login(userData);
+            navigate("/");
+        } catch (error) {
+            if (error instanceof ApiError) {
+                if (error.errors) {
+                    setErrors(error.errors);
+                } else {
+                    setApiError(error.message);
+                }
+            } else {
+                setApiError("An unexpected error occurred. Please try again.");
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     const inputClass = (field) =>
@@ -66,9 +92,16 @@ export default function Login() {
             </div>
             <form
                 className="mt-10 bg-white p-8 rounded-xl shadow-lg w-full max-w-lg mx-auto space-y-6"
-                action={submitAction}
+                onSubmit={submitAction}
             >
                 <h2 className="text-3xl font-bold text-center text-blue-600">Login</h2>
+
+                {/* API Error */}
+                {apiError && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                        {apiError}
+                    </div>
+                )}
 
                 {/* Email */}
                 <div>
@@ -99,8 +132,12 @@ export default function Login() {
                 </div>
 
                 {/* Submit */}
-                <button className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
-                    Login
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {loading ? "Logging in..." : "Login"}
                 </button>
 
                 {/* Register link */}

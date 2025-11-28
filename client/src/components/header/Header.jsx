@@ -1,6 +1,15 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useUser } from "../../context/UserContext";
 
 export default function Header() {
+    const { user, logout, isAuthenticated } = useUser();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/");
+    };
+
     return (
         <header className="bg-blue-600 text-white shadow-md">
             <div className="max-w-7xl mx-auto w-full flex items-center justify-between py-4 px-6">
@@ -20,10 +29,28 @@ export default function Header() {
                     <Link to="/games" className="hover:text-blue-200 transition">Games</Link>
                     <Link to="/store" className="hover:text-blue-200 transition">Store</Link>
                     <Link to="/leaderboard" className="hover:text-blue-200 transition">Leaderboard</Link>
-                    <Link to="/login" className="hover:text-blue-200 transition">Login</Link>
-                    <Link to="/register" className="hover:text-blue-200 transition">Register</Link>
-                    <Link to="/profile" className="hover:text-blue-200 transition">Profile</Link>
-                    <Link to="/logout" className="hover:text-blue-200 transition">Logout</Link>
+
+                    {isAuthenticated ? (
+                        <>
+                            <Link to="/profile" className="hover:text-blue-200 transition">
+                                Profile
+                            </Link>
+                            <span className="text-blue-200">
+                                Hello, {user?.firstName}!
+                            </span>
+                            <button
+                                onClick={handleLogout}
+                                className="hover:text-blue-200 transition cursor-pointer"
+                            >
+                                Logout
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <Link to="/login" className="hover:text-blue-200 transition">Login</Link>
+                            <Link to="/register" className="hover:text-blue-200 transition">Register</Link>
+                        </>
+                    )}
                 </div>
             </div>
         </header>
