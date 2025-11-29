@@ -6,6 +6,7 @@ import Leaderboard from "./components/leaderboard-page/Leaderboard.jsx"
 import Home from "./components/home-page/Home.jsx"
 import Register from "./components/register-page/Register.jsx"
 import Login from "./components/login-page/Login.jsx"
+import NotFound from "./components/not-found-page/NotFound.jsx"
 
 function App() {
 
@@ -19,6 +20,8 @@ function App() {
                 <Route path="/leaderboard" element={<Leaderboard />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
+
+                <Route path='*' element={<NotFound />} />
             </Routes>
 
             <Footer />
