@@ -51,6 +51,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!-- Load .env into System properties for Spring when running locally -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>java-dotenv</artifactId>
+            <version>5.2.2</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.cloudinary/cloudinary-http45 -->
         <dependency>
             <groupId>com.cloudinary</groupId>
