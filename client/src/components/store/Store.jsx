@@ -1,19 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import ItemCard from "./item/ItemCard.jsx";
 
-const storeItems = [
-  { id: 1, name: "Sticker Pack", price: 10, emoji: "✨" },
-  { id: 2, name: "Toy Car", price: 50, emoji: "🚗" },
-  { id: 3, name: "Story Book", price: 30, emoji: "📚" },
-  { id: 4, name: "Ice Cream", price: 20, emoji: "🍦" },
-  { id: 5, name: "Puzzle", price: 40, emoji: "🧩" },
-];
+// const storeItems = [
+//   { id: 1, name: "Sticker Pack", price: 10, emoji: "✨" },
+//   { id: 2, name: "Toy Car", price: 50, emoji: "🚗" },
+//   { id: 3, name: "Story Book", price: 30, emoji: "📚" },
+//   { id: 4, name: "Ice Cream", price: 20, emoji: "🍦" },
+//   { id: 5, name: "Puzzle", price: 40, emoji: "🧩" },
+// ];
 
 export default function Store() {
   const [balance, setBalance] = useState(100); // Kid's coins
   const [cart, setCart] = useState([]);
+  const [storeItems, setStoreItems] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchStoreItems = async() => {
+      try {
+        const response = await fetch('http://localhost:8080/api/store');
+        if (!response.ok) throw new Error("Failed to fetch store items");
+        const data = await response.json();
+        setStoreItems(data);
+
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    fetchStoreItems();
+  }, [])
 
   const buyItem = (item) => {
     if (balance < item.price) {
