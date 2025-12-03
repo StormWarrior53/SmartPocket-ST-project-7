@@ -3,6 +3,7 @@ import ParentBenefits from "./parent-benefits/ParentBenefits.jsx";
 import Hero from "./hero-section/Hero.jsx";
 import Steps from "./steps/Steps.jsx";
 import LeaderboardBadges from "./leaderboard-badges/LeaderboardBadges.jsx";
+import RoadmapPart from "./roadmap/RoadmapPart.jsx";
 
 export default function Home() {
 
@@ -14,6 +15,9 @@ export default function Home() {
 
             {/* How it works */}
             <Steps />
+
+            {/* RoadMap */}
+            <RoadmapPart />
 
             {/* Leaderboard + Badges */}
             <LeaderboardBadges />
