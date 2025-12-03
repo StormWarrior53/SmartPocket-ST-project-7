@@ -33,13 +33,14 @@ public class ParentService {
                 .build();
 
         Parent savedParent = parentRepository.save(parent);
-        String token = jwtUtil.generateToken(savedParent.getId(), savedParent.getEmail());
+        String token = jwtUtil.generateToken(savedParent.getId(), savedParent.getEmail(), "parent");
 
         return AuthResponse.builder()
                 .id(savedParent.getId())
                 .email(savedParent.getEmail())
                 .firstName(savedParent.getFirstName())
                 .lastName(savedParent.getLastName())
+                .role("parent")
                 .createdAt(savedParent.getCreatedAt())
                 .token(token)
                 .tokenType("Bearer")
@@ -55,13 +56,14 @@ public class ParentService {
             throw new IllegalArgumentException("Invalid email or password");
         }
 
-        String token = jwtUtil.generateToken(parent.getId(), parent.getEmail());
+        String token = jwtUtil.generateToken(parent.getId(), parent.getEmail(), "parent");
 
         return AuthResponse.builder()
                 .id(parent.getId())
                 .email(parent.getEmail())
                 .firstName(parent.getFirstName())
                 .lastName(parent.getLastName())
+                .role("parent")
                 .createdAt(parent.getCreatedAt())
                 .token(token)
                 .tokenType("Bearer")
