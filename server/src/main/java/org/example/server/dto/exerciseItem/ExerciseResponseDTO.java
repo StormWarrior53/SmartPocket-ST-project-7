@@ -1,5 +1,7 @@
 package org.example.server.dto.exerciseItem;
 
+import org.example.server.model.DifficultyLevel;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -8,6 +10,6 @@ public record ExerciseResponseDTO(
         String title,
         String path,
         String description,
-        String difficultyLevel
+        DifficultyLevel difficultyLevel
 ) {}
 

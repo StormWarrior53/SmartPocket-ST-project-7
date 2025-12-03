@@ -4,6 +4,7 @@ import org.example.server.dto.exerciseItem.ExerciseRequestDTO;
 import org.example.server.dto.exerciseItem.ExerciseResponseDTO;
 import org.example.server.exception.ExerciseNotFoundException;
 import org.example.server.mapper.ExerciseMapper;
+import org.example.server.model.DifficultyLevel;
 import org.example.server.model.Exercise;
 import org.example.server.repository.ExerciseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,19 +41,6 @@ public class ExerciseService {
         return mapper.toResponse(updated);
     }
 
-    public ExerciseResponseDTO patchExercise(UUID id, ExerciseRequestDTO request) {
-        Exercise exercise = repository.findById(id)
-                .orElseThrow(() -> new ExerciseNotFoundException(id));
-
-        if (request.title() != null) exercise.setTitle(request.title());
-        if (request.path() != null) exercise.setPath(request.path());
-        if (request.description() != null) exercise.setDescription(request.description());
-        if (request.difficultyLevel() != null) exercise.setDifficultyLevel(request.difficultyLevel());
-
-        Exercise updated = repository.save(exercise);
-        return mapper.toResponse(updated);
-    }
-
     public void deleteExercise(UUID id) {
         if (!repository.existsById(id)) throw new ExerciseNotFoundException(id);
         repository.deleteById(id);
@@ -77,7 +65,7 @@ public class ExerciseService {
         return exercises.map(mapper::toResponse);
     }
 
-    public List<ExerciseResponseDTO> getExercisesByDifficulty(String difficultyLevel) {
+    public List<ExerciseResponseDTO> getExercisesByDifficulty(DifficultyLevel difficultyLevel) {
         return repository.findByDifficultyLevel(difficultyLevel).stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());

@@ -3,6 +3,7 @@ package org.example.server.controller;
 import jakarta.validation.Valid;
 import org.example.server.dto.exerciseItem.ExerciseRequestDTO;
 import org.example.server.dto.exerciseItem.ExerciseResponseDTO;
+import org.example.server.model.DifficultyLevel;
 import org.example.server.service.ExerciseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -61,7 +62,7 @@ public class ExerciseController {
 
     // Filtering
     @GetMapping("/difficulty/{level}")
-    public List<ExerciseResponseDTO> getExercisesByDifficulty(@PathVariable String level) {
+    public List<ExerciseResponseDTO> getExercisesByDifficulty(@PathVariable DifficultyLevel level) {
         return service.getExercisesByDifficulty(level);
     }
 
