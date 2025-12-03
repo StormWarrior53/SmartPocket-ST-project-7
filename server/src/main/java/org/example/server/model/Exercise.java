@@ -24,7 +24,8 @@ public class Exercise {
     private String description;
 
     @Column(nullable = false)
-    private String difficultyLevel;
+    @Enumerated(EnumType.STRING)
+    private DifficultyLevel difficultyLevel;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -65,8 +66,8 @@ public class Exercise {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public String getDifficultyLevel() { return difficultyLevel; }
-    public void setDifficultyLevel(String description) { this.difficultyLevel = difficultyLevel; }
+    public DifficultyLevel getDifficultyLevel() { return difficultyLevel; }
+    public void setDifficultyLevel(DifficultyLevel difficultyLevel) { this.difficultyLevel = difficultyLevel; }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
