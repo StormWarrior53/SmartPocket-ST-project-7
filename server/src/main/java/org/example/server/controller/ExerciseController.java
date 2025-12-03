@@ -34,16 +34,6 @@ public class ExerciseController {
         return service.getAllExercises();
     }
 
-    @GetMapping("/paged")
-    public Page<ExerciseResponseDTO> getExercisesPaged(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "true") boolean asc
-    ) {
-        return service.getExercisesPaged(page, size, sortBy, asc);
-    }
-
     @PostMapping
     public ExerciseResponseDTO createExercise(@Valid @RequestBody ExerciseRequestDTO request) {
         return service.createExercise(request);

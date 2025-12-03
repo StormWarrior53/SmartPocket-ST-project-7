@@ -58,13 +58,6 @@ public class ExerciseService {
                 .collect(Collectors.toList());
     }
 
-    public Page<ExerciseResponseDTO> getExercisesPaged(int page, int size, String sortBy, boolean asc) {
-        Sort sort = asc ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Exercise> exercises = repository.findAll(pageable);
-        return exercises.map(mapper::toResponse);
-    }
-
     public List<ExerciseResponseDTO> getExercisesByDifficulty(DifficultyLevel difficultyLevel) {
         return repository.findByDifficultyLevel(difficultyLevel).stream()
                 .map(mapper::toResponse)
