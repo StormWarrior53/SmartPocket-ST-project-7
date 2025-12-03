@@ -11,18 +11,18 @@ import java.util.UUID;
 @Repository
 public interface ExerciseRepository extends JpaRepository<Exercise, UUID> {
 
-    // Намира упражнение по заглавие
+    // Finds Exercise by Title
     Optional<Exercise> findByTitle(String title);
 
-    // Връща всички упражнения с дадено ниво на трудност
+    // Returns Exercises by set difficulty level
     List<Exercise> findByDifficultyLevel(String difficultyLevel);
 
-    // Връща всички упражнения, съдържащи определен текст в заглавието
+    // Returns all Exercises with a keyword in their title
     List<Exercise> findByTitleContainingIgnoreCase(String keyword);
 
-    // Връща всички упражнения, сортирани по заглавие (ASC)
+    // Returns all Exercises sorted by title (ASC)
     List<Exercise> findAllByOrderByTitleAsc();
 
-    // Връща всички упражнения, сортирани по създаване (createdAt DESC)
+    // Returns all Exercises sorted by creation date (createdAt DESC)
     List<Exercise> findAllByOrderByCreatedAtDesc();
 }

@@ -54,12 +54,6 @@ public class ExerciseController {
         return service.updateExercise(id, request);
     }
 
-    @PatchMapping("/{id}")
-    public ExerciseResponseDTO patchExercise(@PathVariable UUID id,
-                                             @RequestBody ExerciseRequestDTO request) {
-        return service.patchExercise(id, request);
-    }
-
     @DeleteMapping("/{id}")
     public void deleteExercise(@PathVariable UUID id) {
         service.deleteExercise(id);
