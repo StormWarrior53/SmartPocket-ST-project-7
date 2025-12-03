@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/exercises")
@@ -23,7 +24,7 @@ public class ExerciseController {
 
     // CRUD
     @GetMapping("/{id}")
-    public ExerciseResponseDTO getExerciseById(@PathVariable Long id) {
+    public ExerciseResponseDTO getExerciseById(@PathVariable UUID id) {
         return service.getExerciseById(id);
     }
 
@@ -48,19 +49,19 @@ public class ExerciseController {
     }
 
     @PutMapping("/{id}")
-    public ExerciseResponseDTO updateExercise(@PathVariable Long id,
+    public ExerciseResponseDTO updateExercise(@PathVariable UUID id,
                                               @Valid @RequestBody ExerciseRequestDTO request) {
         return service.updateExercise(id, request);
     }
 
     @PatchMapping("/{id}")
-    public ExerciseResponseDTO patchExercise(@PathVariable Long id,
+    public ExerciseResponseDTO patchExercise(@PathVariable UUID id,
                                              @RequestBody ExerciseRequestDTO request) {
         return service.patchExercise(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteExercise(@PathVariable Long id) {
+    public void deleteExercise(@PathVariable UUID id) {
         service.deleteExercise(id);
     }
 

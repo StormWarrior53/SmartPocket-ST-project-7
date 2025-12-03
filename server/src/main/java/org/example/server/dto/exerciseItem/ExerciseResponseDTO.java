@@ -8,7 +8,6 @@ public record ExerciseResponseDTO(
         String title,
         String path,
         String description,
-        String difficultyLevel, LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        String difficultyLevel
 ) {}
 

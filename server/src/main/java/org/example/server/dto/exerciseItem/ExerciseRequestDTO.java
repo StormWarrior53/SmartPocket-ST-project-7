@@ -16,7 +16,7 @@ public record ExerciseRequestDTO(
         @Size(max = 2000, message = "Description must be at most 2000 characters")
         String description,
 
-        @NotBlank(message = " is required")
+        @NotBlank(message = "Difficulty level is required")
         @Size(max = 100, message = "Path must be at most 100 characters")
                 String difficultyLevel
 ) {

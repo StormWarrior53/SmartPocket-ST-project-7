@@ -24,9 +24,7 @@ public interface ExerciseMapper {
                     exercise.getTitle(),
                     exercise.getPath(),
                     exercise.getDescription(),
-                    exercise.getDifficultyLevel(),
-                    exercise.getCreatedAt(),
-                    exercise.getUpdatedAt()
+                    exercise.getDifficultyLevel()
             );
         }
 

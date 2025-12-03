@@ -11,6 +11,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,7 +32,7 @@ public class ExerciseService {
         return mapper.toResponse(saved);
     }
 
-    public ExerciseResponseDTO updateExercise(Long id, ExerciseRequestDTO request) {
+    public ExerciseResponseDTO updateExercise(UUID id, ExerciseRequestDTO request) {
         Exercise exercise = repository.findById(id)
                 .orElseThrow(() -> new ExerciseNotFoundException(id));
         mapper.updateEntity(exercise, request);
@@ -39,7 +40,7 @@ public class ExerciseService {
         return mapper.toResponse(updated);
     }
 
-    public ExerciseResponseDTO patchExercise(Long id, ExerciseRequestDTO request) {
+    public ExerciseResponseDTO patchExercise(UUID id, ExerciseRequestDTO request) {
         Exercise exercise = repository.findById(id)
                 .orElseThrow(() -> new ExerciseNotFoundException(id));
 
@@ -52,12 +53,12 @@ public class ExerciseService {
         return mapper.toResponse(updated);
     }
 
-    public void deleteExercise(Long id) {
+    public void deleteExercise(UUID id) {
         if (!repository.existsById(id)) throw new ExerciseNotFoundException(id);
         repository.deleteById(id);
     }
 
-    public ExerciseResponseDTO getExerciseById(Long id) {
+    public ExerciseResponseDTO getExerciseById(UUID id) {
         Exercise exercise = repository.findById(id)
                 .orElseThrow(() -> new ExerciseNotFoundException(id));
         return mapper.toResponse(exercise);

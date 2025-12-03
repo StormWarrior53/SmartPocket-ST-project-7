@@ -65,7 +65,7 @@ public class Exercise {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public String getDifficultyLevel() { return description; }
+    public String getDifficultyLevel() { return difficultyLevel; }
     public void setDifficultyLevel(String description) { this.description = description; }
 
     public LocalDateTime getCreatedAt() {
