@@ -10,6 +10,7 @@ import NotFound from "./components/not-found-page/NotFound.jsx"
 import Store from "./components/store/Store.jsx"
 import Roadmap from "./components/roadmap-page/Roadmap.jsx"
 import Profile from "./components/profile/Profile.jsx"
+import RoadmapDetails from "./components/roadmap-details/RoadmapDetails.jsx"
 function App() {
 
     return (
@@ -24,6 +25,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/store" element={<Store />} />
                     <Route path="/roadmap" element={<Roadmap />} />
+                    <Route path="/roadmap/:lectureId" element={<RoadmapDetails />} />
                     <Route path="/profile" element={<Profile />} />
 
                     <Route path='*' element={<NotFound />} />
