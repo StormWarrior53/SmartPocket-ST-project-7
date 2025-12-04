@@ -133,6 +133,13 @@ public class ChildService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public ChildResponse getChildProfile(UUID childId) {
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new IllegalArgumentException("Child not found"));
+        return toChildResponse(child);
+    }
+
     // CRUD operations for parents to manage their children
 
     @Transactional

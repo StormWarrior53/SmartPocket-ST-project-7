@@ -34,6 +34,13 @@ public class ParentController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<ParentResponse> getMyProfile() {
+        UUID parentId = authenticationUtil.getCurrentUserId();
+        ParentResponse response = parentService.getParentProfile(parentId);
+        return ResponseEntity.ok(response);
+    }
+
     // Child management endpoints - all use authenticated parent ID
 
     @PostMapping("/me/children")

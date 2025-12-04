@@ -40,6 +40,7 @@ public class SecurityConfig {
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
             // Protected endpoints - authentication required
             .requestMatchers("/api/parents/me/**").authenticated()
+            .requestMatchers("/api/children/me").authenticated()
             .anyRequest().authenticated())
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

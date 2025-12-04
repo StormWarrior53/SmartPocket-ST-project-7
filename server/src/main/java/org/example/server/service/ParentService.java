@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.server.dto.AuthResponse;
 import org.example.server.dto.LoginRequest;
+import org.example.server.dto.ParentResponse;
 import org.example.server.dto.RegisterParentRequest;
 import org.example.server.model.Parent;
 import org.example.server.repository.ParentRepository;
@@ -87,6 +88,20 @@ public class ParentService {
                 .createdAt(parent.getCreatedAt())
                 .token(token)
                 .tokenType("Bearer")
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public ParentResponse getParentProfile(java.util.UUID parentId) {
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new IllegalArgumentException("Parent not found"));
+
+        return ParentResponse.builder()
+                .id(parent.getId())
+                .email(parent.getEmail())
+                .firstName(parent.getFirstName())
+                .lastName(parent.getLastName())
+                .createdAt(parent.getCreatedAt())
                 .build();
     }
 }
