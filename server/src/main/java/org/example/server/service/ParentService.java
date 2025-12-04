@@ -6,6 +6,9 @@ import org.example.server.dto.AuthResponse;
 import org.example.server.dto.LoginRequest;
 import org.example.server.dto.ParentResponse;
 import org.example.server.dto.RegisterParentRequest;
+import org.example.server.exception.DuplicateResourceException;
+import org.example.server.exception.InvalidCredentialsException;
+import org.example.server.exception.ResourceNotFoundException;
 import org.example.server.model.Parent;
 import org.example.server.repository.ParentRepository;
 import org.example.server.util.JwtUtil;
@@ -28,7 +31,7 @@ public class ParentService {
 
         if (parentRepository.existsByEmail(request.getEmail())) {
             log.warn("Registration failed – email already registered: {}", request.getEmail());
-            throw new IllegalArgumentException("Email already registered");
+            throw new DuplicateResourceException("Email already registered");
         }
         try {
             Parent parent = Parent.builder()
@@ -67,12 +70,12 @@ public class ParentService {
         Parent parent = parentRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> {
                     log.warn("Login failed – email not found: {}", request.getEmail());
-                    return new IllegalArgumentException("Invalid email or password");
+                    return new InvalidCredentialsException("Invalid email or password");
                 });
 
         if (!passwordEncoder.matches(request.getPassword(), parent.getPasswordHash())) {
             log.warn("Login failed – wrong password. Email={}", request.getEmail());
-            throw new IllegalArgumentException("Invalid email or password");
+            throw new InvalidCredentialsException("Invalid email or password");
         }
 
         log.info("Login successful. ParentId={}", parent.getId());
@@ -94,7 +97,7 @@ public class ParentService {
     @Transactional(readOnly = true)
     public ParentResponse getParentProfile(java.util.UUID parentId) {
         Parent parent = parentRepository.findById(parentId)
-                .orElseThrow(() -> new IllegalArgumentException("Parent not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Parent not found"));
 
         return ParentResponse.builder()
                 .id(parent.getId())

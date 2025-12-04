@@ -2,6 +2,10 @@ package org.example.server.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.server.dto.*;
+import org.example.server.exception.AccessDeniedException;
+import org.example.server.exception.DuplicateResourceException;
+import org.example.server.exception.InvalidCredentialsException;
+import org.example.server.exception.ResourceNotFoundException;
 import org.example.server.model.Child;
 import org.example.server.model.Parent;
 import org.example.server.repository.ChildRepository;
@@ -31,11 +35,11 @@ public class ChildService {
         Child child = childRepository.findByNameAndParentFirstName(
                 request.getChildName(),
                 request.getParentName()
-        ).orElseThrow(() -> new IllegalArgumentException("Invalid child name, parent name, or pattern"));
+        ).orElseThrow(() -> new InvalidCredentialsException("Invalid child name, parent name, or pattern"));
 
         // Validate pattern against stored pinHash
         if (!passwordEncoder.matches(request.getPattern(), child.getPinHash())) {
-            throw new IllegalArgumentException("Invalid child name, parent name, or pattern");
+            throw new InvalidCredentialsException("Invalid child name, parent name, or pattern");
         }
 
         // Generate JWT token with child role
@@ -84,11 +88,11 @@ public class ChildService {
         Child child = childRepository.findByNameAndParentFirstName(
                 request.getChildName(),
                 request.getParentName()
-        ).orElseThrow(() -> new IllegalArgumentException("Child not found under this parent"));
+        ).orElseThrow(() -> new ResourceNotFoundException("Child not found under this parent"));
 
         // Check if pattern is already set
         if (child.getPinHash() != null && !child.getPinHash().isEmpty()) {
-            throw new IllegalArgumentException("Pattern is already set for this child");
+            throw new DuplicateResourceException("Pattern is already set for this child");
         }
 
         // Hash and set the pattern
@@ -136,7 +140,7 @@ public class ChildService {
     @Transactional(readOnly = true)
     public ChildResponse getChildProfile(UUID childId) {
         Child child = childRepository.findById(childId)
-                .orElseThrow(() -> new IllegalArgumentException("Child not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
         return toChildResponse(child);
     }
 
@@ -145,7 +149,7 @@ public class ChildService {
     @Transactional
     public ChildResponse createChild(UUID parentId, CreateChildRequest request) {
         Parent parent = parentRepository.findById(parentId)
-                .orElseThrow(() -> new IllegalArgumentException("Parent not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Parent not found"));
 
         Child child = Child.builder()
                 .parent(parent)
@@ -165,11 +169,11 @@ public class ChildService {
     @Transactional(readOnly = true)
     public ChildResponse getChildById(UUID parentId, UUID childId) {
         Child child = childRepository.findById(childId)
-                .orElseThrow(() -> new IllegalArgumentException("Child not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
 
         // Verify ownership
         if (!child.getParent().getId().equals(parentId)) {
-            throw new IllegalArgumentException("Access denied: Child does not belong to this parent");
+            throw new AccessDeniedException("Access denied: Child does not belong to this parent");
         }
 
         return toChildResponse(child);
@@ -185,11 +189,11 @@ public class ChildService {
     @Transactional
     public ChildResponse updateChild(UUID parentId, UUID childId, UpdateChildRequest request) {
         Child child = childRepository.findById(childId)
-                .orElseThrow(() -> new IllegalArgumentException("Child not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
 
         // Verify ownership
         if (!child.getParent().getId().equals(parentId)) {
-            throw new IllegalArgumentException("Access denied: Child does not belong to this parent");
+            throw new AccessDeniedException("Access denied: Child does not belong to this parent");
         }
 
         child.setName(request.getName());
@@ -202,11 +206,11 @@ public class ChildService {
     @Transactional
     public void deleteChild(UUID parentId, UUID childId) {
         Child child = childRepository.findById(childId)
-                .orElseThrow(() -> new IllegalArgumentException("Child not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
 
         // Verify ownership
         if (!child.getParent().getId().equals(parentId)) {
-            throw new IllegalArgumentException("Access denied: Child does not belong to this parent");
+            throw new AccessDeniedException("Access denied: Child does not belong to this parent");
         }
 
         childRepository.delete(child);
@@ -215,11 +219,11 @@ public class ChildService {
     @Transactional
     public ChildResponse resetPattern(UUID parentId, UUID childId) {
         Child child = childRepository.findById(childId)
-                .orElseThrow(() -> new IllegalArgumentException("Child not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
 
         // Verify ownership
         if (!child.getParent().getId().equals(parentId)) {
-            throw new IllegalArgumentException("Access denied: Child does not belong to this parent");
+            throw new AccessDeniedException("Access denied: Child does not belong to this parent");
         }
 
         // Reset the pattern by setting pinHash to null
