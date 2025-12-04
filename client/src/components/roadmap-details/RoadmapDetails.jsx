@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router"
+import { useUser } from "../../context/UserContext.jsx";
 
 export default function RoadmapDetails() {
     const { lectureId } = useParams();
@@ -7,6 +8,7 @@ export default function RoadmapDetails() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [pocketMoneyGiven, setPocketMoneyGiven] = useState(false);
+    const { user, isAuthenticated } = useUser();
 
     useEffect(() => {
         const given = localStorage.getItem(`pocketMoney_${lectureId}`);
@@ -44,14 +46,15 @@ export default function RoadmapDetails() {
             <p className="text-gray-600 mb-2">Difficulty: {lecture.difficultyLevel}</p>
             <p className="text-gray-800 mb-4">{lecture.description}</p>
 
-            <button
+            {user && isAuthenticated && <button
                 onClick={handleGivePocketMoney}
                 disabled={pocketMoneyGiven}
                 className={`px-4 py-2 rounded-lg text-white font-semibold ${pocketMoneyGiven ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 hover:bg-green-600"
                     }`}
             >
                 {pocketMoneyGiven ? "PocketMoney Received" : "Get PocketMoney"}
-            </button>
+            </button>}
+
         </div>
 
 
