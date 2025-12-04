@@ -72,4 +72,12 @@ public class ParentController {
         childService.deleteChild(parentId, childId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{parentId}/children/{childId}/reset-pattern")
+    public ResponseEntity<ChildResponse> resetPattern(
+            @PathVariable UUID parentId,
+            @PathVariable UUID childId) {
+        ChildResponse response = childService.resetPattern(parentId, childId);
+        return ResponseEntity.ok(response);
+    }
 }

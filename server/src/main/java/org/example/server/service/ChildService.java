@@ -205,6 +205,23 @@ public class ChildService {
         childRepository.delete(child);
     }
 
+    @Transactional
+    public ChildResponse resetPattern(UUID parentId, UUID childId) {
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new IllegalArgumentException("Child not found"));
+
+        // Verify ownership
+        if (!child.getParent().getId().equals(parentId)) {
+            throw new IllegalArgumentException("Access denied: Child does not belong to this parent");
+        }
+
+        // Reset the pattern by setting pinHash to null
+        child.setPinHash(null);
+        Child updatedChild = childRepository.save(child);
+
+        return toChildResponse(updatedChild);
+    }
+
     // Helper method to convert Child to ChildResponse
     private ChildResponse toChildResponse(Child child) {
         return ChildResponse.builder()
