@@ -32,9 +32,14 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/parents/register", "/api/parents/login", "/api/store/**", "/api/exercises/**", "/api/children/**")
-            .permitAll()
+            // Public endpoints - no authentication required
+            .requestMatchers("/api/parents/register", "/api/parents/login").permitAll()
+            .requestMatchers("/api/children/check-name", "/api/children/setup-pattern", "/api/children/login").permitAll()
+            .requestMatchers("/api/children", "/api/children/by-parent/**").permitAll() // For child selection
+            .requestMatchers("/api/store/**", "/api/exercises/**").permitAll()
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+            // Protected endpoints - authentication required
+            .requestMatchers("/api/parents/me/**").authenticated()
             .anyRequest().authenticated())
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
