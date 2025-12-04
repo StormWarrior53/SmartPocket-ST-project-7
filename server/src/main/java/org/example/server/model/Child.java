@@ -31,8 +31,8 @@ public class Child {
     @Max(24)
     private int age;
 
-    @Column(nullable = false)
-    private String pinHash; // PIN acts as the child's password
+    @Column(nullable = true)
+    private String pinHash; // Pattern/PIN acts as the child's password (nullable for first-time setup)
 
     // Gamification fields
     @Builder.Default
