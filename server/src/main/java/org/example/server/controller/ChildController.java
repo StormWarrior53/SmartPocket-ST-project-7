@@ -44,6 +44,19 @@ public class ChildController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(jakarta.servlet.http.HttpServletRequest request) {
+        UUID childId = authenticationUtil.getCurrentUserId();
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            childService.logout(childId, token);
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping
     public ResponseEntity<List<ChildListResponse>> getAllChildren() {
         List<ChildListResponse> children = childService.getAllChildren();

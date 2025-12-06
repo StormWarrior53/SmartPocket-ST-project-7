@@ -41,6 +41,19 @@ public class ParentController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(jakarta.servlet.http.HttpServletRequest request) {
+        UUID parentId = authenticationUtil.getCurrentUserId();
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            parentService.logout(parentId, token);
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
     // Child management endpoints - all use authenticated parent ID
 
     @PostMapping("/me/children")
