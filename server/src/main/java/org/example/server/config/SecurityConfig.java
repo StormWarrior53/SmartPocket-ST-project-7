@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final RateLimitFilter rateLimitFilter;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -32,16 +33,16 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            // Public endpoints - no authentication required
             .requestMatchers("/api/parents/register", "/api/parents/login").permitAll()
-            .requestMatchers("/api/children/check-name", "/api/children/setup-pattern", "/api/children/login").permitAll()
-            .requestMatchers("/api/children", "/api/children/by-parent/**").permitAll() // For child selection
+            .requestMatchers("/api/children/check-name", "/api/children/setup-pattern", "/api/children/login")
+            .permitAll()
             .requestMatchers("/api/store/**", "/api/exercises/**").permitAll()
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-            // Protected endpoints - authentication required
             .requestMatchers("/api/parents/me/**").authenticated()
             .requestMatchers("/api/children/me").authenticated()
+            .requestMatchers("/api/children/**").authenticated()
             .anyRequest().authenticated())
+        .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
