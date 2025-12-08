@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+    <!--
+        COMMON PATTERN
+        %d = date
+        %highlight(%-5level) = colorized log level (in console)
+        [%thread] = thread name
+        %logger{36} = logger name, max 36 chars
+        %msg = actual log message
+     -->
+    <property name="LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n" />
+
+    <!-- Root logs directory -->
+    <property name="LOG_DIR" value="logs" />
+
+    <!-- ================================================================== -->
+    <!-- CONSOLE APPENDER (shown in development)                            -->
+    <!-- ================================================================== -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [req=%X{requestId} user=%X{user} ip=%X{ip}] %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ================================================================== -->
+    <!-- GENERAL APPLICATION LOG                                             -->
+    <!-- ================================================================== -->
+    <appender name="AppFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/app.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Daily rotation -->
+            <fileNamePattern>${LOG_DIR}/archived/app.%d{yyyy-MM-dd}.gz</fileNamePattern>
+
+            <!-- Keep 30 days -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ================================================================== -->
+    <!-- ERROR LOG (only errors)                                             -->
+    <!-- ================================================================== -->
+    <appender name="ErrorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/error.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/archived/error.%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- ================================================================== -->
+    <!-- SECURITY LOG (authorization, authentication, login attempts)       -->
+    <!-- ================================================================== -->
+    <appender name="SecurityFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/security.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/archived/security.%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ================================================================== -->
+    <!-- LOGGER DEFINITIONS                                                  -->
+    <!-- ================================================================== -->
+
+    <!-- App-level loggers -->
+    <logger name="org.example.server" level="INFO" additivity="false">
+        <appender-ref ref="AppFile"/>
+        <appender-ref ref="Console"/>
+    </logger>
+
+    <!-- Security-specific logs -->
+    <logger name="org.example.server.security" level="INFO" additivity="false">
+        <appender-ref ref="SecurityFile"/>
+        <appender-ref ref="Console"/>
+    </logger>
+
+    <!-- Hibernate logs (optional, dev only) -->
+    <logger name="org.hibernate.SQL" level="WARN"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>
+
+    <!-- Global error logger -->
+    <root level="INFO">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="AppFile"/>
+        <appender-ref ref="ErrorFile"/>
+    </root>
+
+</configuration>
