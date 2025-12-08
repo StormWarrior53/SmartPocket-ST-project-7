@@ -2,7 +2,7 @@ import { Link } from "react-router";
 
 export default function Footer() {
     return (
-        <footer className="bg-blue-600 shadow-sm mt-12">
+        <footer className="bg-blue-600 shadow-sm">
             <div className="max-w-5xl mx-auto py-8 px-6 sm:px-12 text-center space-y-4">
 
                 <h2 className="text-2xl font-bold text-white">SmartPocket</h2>
