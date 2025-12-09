@@ -11,27 +11,28 @@ import Store from "./components/store/Store.jsx"
 import Roadmap from "./components/roadmap-page/Roadmap.jsx"
 import Profile from "./components/profile/Profile.jsx"
 import RoadmapDetails from "./components/roadmap-details/RoadmapDetails.jsx"
+import Games from "./components/games-page/Games.jsx"
 function App() {
 
     return (
         <>
-                <Header />
+            <Header />
 
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/leaderboard" element={<Leaderboard />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/store" element={<Store />} />
-                    <Route path="/roadmap" element={<Roadmap />} />
-                    <Route path="/roadmap/:lectureId" element={<RoadmapDetails />} />
-                    <Route path="/profile" element={<Profile />} />
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/store" element={<Store />} />
+                <Route path="/roadmap" element={<Roadmap />} />
+                <Route path="/roadmap/:lectureId" element={<RoadmapDetails />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/games" element={<Games />} />
+                <Route path='*' element={<NotFound />} />
+            </Routes>
 
-                    <Route path='*' element={<NotFound />} />
-                </Routes>
-
-                <Footer />
+            <Footer />
         </>
     )
 }
