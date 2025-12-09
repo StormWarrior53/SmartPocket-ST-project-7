@@ -4,13 +4,14 @@
     <!--
         COMMON PATTERN
         %d = date
-        %highlight(%-5level) = colorized log level (in console)
+        %-5level = log level (padded)
         [%thread] = thread name
+        [req=%X{requestId} user=%X{user} ip=%X{ip}] = MDC context (request ID, user, IP)
         %logger{36} = logger name, max 36 chars
         %msg = actual log message
      -->
     <property name="LOG_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n" />
+              value="%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] [req=%X{requestId} user=%X{user} ip=%X{ip}] %logger{36} - %msg%n" />
 
     <!-- Root logs directory -->
     <property name="LOG_DIR" value="logs" />

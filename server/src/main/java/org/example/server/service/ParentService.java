@@ -24,7 +24,6 @@ public class ParentService {
     @Transactional
     public AuthResponse registerParent(RegisterParentRequest request) {
         log.info("Attempting to register parent. Email={}", request.getEmail());
-        log.debug("RegisterParent payload: {}", request);
 
         if (parentRepository.existsByEmail(request.getEmail())) {
             log.warn("Registration failed – email already registered: {}", request.getEmail());
@@ -63,7 +62,6 @@ public class ParentService {
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
         log.info("Login attempt. Email={}", request.getEmail());
-        log.debug("Login payload: {}", request);
 
         Parent parent = parentRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> {

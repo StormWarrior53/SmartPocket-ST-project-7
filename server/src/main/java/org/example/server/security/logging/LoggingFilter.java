@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
 
 @Slf4j
 @Component
+@Order(2)
 public class LoggingFilter extends OncePerRequestFilter {
 
     @Override
@@ -55,7 +57,7 @@ public class LoggingFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        // игнорирай static resources и actuator metrics
+        // Ignore static resources and actuator metrics
         String path = request.getRequestURI();
 
         return path.startsWith("/actuator")
