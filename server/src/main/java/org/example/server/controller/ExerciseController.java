@@ -6,7 +6,6 @@ import org.example.server.dto.exerciseItem.ExerciseResponseDTO;
 import org.example.server.model.DifficultyLevel;
 import org.example.server.service.ExerciseService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,48 +15,48 @@ import java.util.UUID;
 @RequestMapping("/api/exercises")
 public class ExerciseController {
 
-    private final ExerciseService service;
+  private final ExerciseService service;
 
-    @Autowired
-    public ExerciseController(ExerciseService service) {
-        this.service = service;
-    }
+  @Autowired
+  public ExerciseController(ExerciseService service) {
+    this.service = service;
+  }
 
-    // CRUD
-    @GetMapping("/{id}")
-    public ExerciseResponseDTO getExerciseById(@PathVariable UUID id) {
-        return service.getExerciseById(id);
-    }
+  // CRUD
+  @GetMapping("/{id}")
+  public ExerciseResponseDTO getExerciseById(@PathVariable UUID id) {
+    return service.getExerciseById(id);
+  }
 
-    @GetMapping
-    public List<ExerciseResponseDTO> getAllExercises() {
-        return service.getAllExercises();
-    }
+  @GetMapping
+  public List<ExerciseResponseDTO> getAllExercises() {
+    return service.getAllExercises();
+  }
 
-    @PostMapping
-    public ExerciseResponseDTO createExercise(@Valid @RequestBody ExerciseRequestDTO request) {
-        return service.createExercise(request);
-    }
+  @PostMapping
+  public ExerciseResponseDTO createExercise(@Valid @RequestBody ExerciseRequestDTO request) {
+    return service.createExercise(request);
+  }
 
-    @PutMapping("/{id}")
-    public ExerciseResponseDTO updateExercise(@PathVariable UUID id,
-                                              @Valid @RequestBody ExerciseRequestDTO request) {
-        return service.updateExercise(id, request);
-    }
+  @PutMapping("/{id}")
+  public ExerciseResponseDTO updateExercise(@PathVariable UUID id,
+      @Valid @RequestBody ExerciseRequestDTO request) {
+    return service.updateExercise(id, request);
+  }
 
-    @DeleteMapping("/{id}")
-    public void deleteExercise(@PathVariable UUID id) {
-        service.deleteExercise(id);
-    }
+  @DeleteMapping("/{id}")
+  public void deleteExercise(@PathVariable UUID id) {
+    service.deleteExercise(id);
+  }
 
-    // Filtering
-    @GetMapping("/difficulty/{level}")
-    public List<ExerciseResponseDTO> getExercisesByDifficulty(@PathVariable DifficultyLevel level) {
-        return service.getExercisesByDifficulty(level);
-    }
+  // Filtering
+  @GetMapping("/difficulty/{level}")
+  public List<ExerciseResponseDTO> getExercisesByDifficulty(@PathVariable DifficultyLevel level) {
+    return service.getExercisesByDifficulty(level);
+  }
 
-    @GetMapping("/search")
-    public List<ExerciseResponseDTO> searchExercisesByTitle(@RequestParam String keyword) {
-        return service.searchExercisesByTitle(keyword);
-    }
+  @GetMapping("/search")
+  public List<ExerciseResponseDTO> searchExercisesByTitle(@RequestParam String keyword) {
+    return service.searchExercisesByTitle(keyword);
+  }
 }

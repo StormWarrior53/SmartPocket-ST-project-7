@@ -18,9 +18,7 @@ public class StoreItemController {
     private final StoreItemService service;
 
     @Autowired
-    public StoreItemController(StoreItemService service) {
-        this.service = service;
-    }
+    public StoreItemController(StoreItemService service) { this.service = service; }
 
     // ----------------- LISTING -----------------
     @GetMapping
