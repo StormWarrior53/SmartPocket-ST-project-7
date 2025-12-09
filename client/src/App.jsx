@@ -12,6 +12,7 @@ import Roadmap from "./components/roadmap-page/Roadmap.jsx"
 import Profile from "./components/profile/Profile.jsx"
 import RoadmapDetails from "./components/roadmap-details/RoadmapDetails.jsx"
 import Games from "./components/games-page/Games.jsx"
+import Quiz from "./components/quiz-page/Quiz.jsx"
 function App() {
 
     return (
@@ -29,6 +30,7 @@ function App() {
                 <Route path="/roadmap/:lectureId" element={<RoadmapDetails />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/games" element={<Games />} />
+                <Route path="/quiz/:id" element={<Quiz />} />
                 <Route path='*' element={<NotFound />} />
             </Routes>
 
