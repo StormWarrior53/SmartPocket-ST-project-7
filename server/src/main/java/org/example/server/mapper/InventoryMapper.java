@@ -20,16 +20,16 @@ public interface InventoryMapper {
 
             StoreItem storeItem = item.getStoreItem();
 
-            return InventoryItemResponse.builder()
-                    .inventoryItemId(item.getId())
-                    .storeItemId(storeItem.getId())
-                    .name(storeItem.getName())
-                    .description(storeItem.getDescription())
-                    .emoji(storeItem.getEmoji())
-                    .pricePaid(item.getPricePaid())
-                    .quantity(item.getQuantity())
-                    .purchasedAt(item.getPurchasedAt())
-                    .build();
+            return new InventoryItemResponse(
+                    item.getId(),
+                    storeItem.getId(),
+                    storeItem.getName(),
+                    storeItem.getDescription(),
+                    storeItem.getEmoji(),
+                    item.getPricePaid(),
+                    item.getQuantity(),
+                    item.getPurchasedAt()
+            );
         }
     }
 }

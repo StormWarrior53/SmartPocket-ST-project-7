@@ -115,7 +115,7 @@ public class ParentController {
             @PathVariable UUID childId,
             @Valid @RequestBody AddMoneyRequest request) {
         UUID parentId = authenticationUtil.getCurrentUserId();
-        ChildResponse response = childService.addMoneyToChild(parentId, childId, request.getAmount());
+        ChildResponse response = childService.addMoneyToChild(parentId, childId, request.amount());
         return ResponseEntity.ok(response);
     }
 }

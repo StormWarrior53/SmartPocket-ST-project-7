@@ -33,27 +33,27 @@ public class ChildService {
   @Transactional(readOnly = true)
   public ChildAuthResponse login(ChildLoginRequest request) {
     Child child = childRepository.findByNameAndParentFirstName(
-        request.getChildName(),
-        request.getParentName())
+        request.childName(),
+        request.parentName())
         .orElseThrow(() -> new InvalidCredentialsException("Invalid child name, parent name, or pattern"));
 
-    if (!passwordEncoder.matches(request.getPattern(), child.getPinHash())) {
+    if (!passwordEncoder.matches(request.pattern(), child.getPinHash())) {
       throw new InvalidCredentialsException("Invalid child name, parent name, or pattern");
     }
 
     String token = jwtUtil.generateToken(child.getId(), child.getName(), "child");
 
-    return ChildAuthResponse.builder()
-        .id(child.getId())
-        .name(child.getName())
-        .age(child.getAge())
-        .xp(child.getXp())
-        .pocketMoney(child.getPocketMoney())
-        .allowanceMoney(child.getAllowanceMoney())
-        .role("child")
-        .token(token)
-        .tokenType("Bearer")
-        .build();
+    return new ChildAuthResponse(
+        child.getId(),
+        child.getName(),
+        child.getAge(),
+        child.getXp(),
+        child.getPocketMoney(),
+        child.getAllowanceMoney(),
+        "child",
+        token,
+        "Bearer"
+    );
   }
 
   @Transactional(readOnly = true)
@@ -61,70 +61,70 @@ public class ChildService {
     Optional<Child> childOptional = childRepository.findByNameAndParentFirstName(childName, parentName);
 
     if (childOptional.isEmpty()) {
-      return CheckNameResponse.builder()
-          .exists(false)
-          .hasPattern(false)
-          .message("Child not found under this parent")
-          .build();
+      return new CheckNameResponse(
+          false,
+          false,
+          "Child not found under this parent"
+      );
     }
 
     Child child = childOptional.get();
     boolean hasPattern = child.getPinHash() != null && !child.getPinHash().isEmpty();
 
-    return CheckNameResponse.builder()
-        .exists(true)
-        .hasPattern(hasPattern)
-        .message(hasPattern ? "Child found, please enter your pattern" : "Child found, please set up your pattern")
-        .build();
+    return new CheckNameResponse(
+        true,
+        hasPattern,
+        hasPattern ? "Child found, please enter your pattern" : "Child found, please set up your pattern"
+    );
   }
 
   @Transactional
   public ChildAuthResponse setupPattern(SetupPatternRequest request) {
     Child child = childRepository.findByNameAndParentFirstName(
-        request.getChildName(),
-        request.getParentName()).orElseThrow(() -> new ResourceNotFoundException("Child not found under this parent"));
+        request.childName(),
+        request.parentName()).orElseThrow(() -> new ResourceNotFoundException("Child not found under this parent"));
 
     if (child.getPinHash() != null && !child.getPinHash().isEmpty()) {
       throw new DuplicateResourceException("Pattern is already set for this child");
     }
 
-    child.setPinHash(passwordEncoder.encode(request.getPattern()));
+    child.setPinHash(passwordEncoder.encode(request.pattern()));
     Child savedChild = childRepository.save(child);
 
     String token = jwtUtil.generateToken(savedChild.getId(), savedChild.getName(), "child");
 
-    return ChildAuthResponse.builder()
-        .id(savedChild.getId())
-        .name(savedChild.getName())
-        .age(savedChild.getAge())
-        .xp(savedChild.getXp())
-        .pocketMoney(savedChild.getPocketMoney())
-        .allowanceMoney(savedChild.getAllowanceMoney())
-        .role("child")
-        .token(token)
-        .tokenType("Bearer")
-        .build();
+    return new ChildAuthResponse(
+        savedChild.getId(),
+        savedChild.getName(),
+        savedChild.getAge(),
+        savedChild.getXp(),
+        savedChild.getPocketMoney(),
+        savedChild.getAllowanceMoney(),
+        "child",
+        token,
+        "Bearer"
+    );
   }
 
   @Transactional(readOnly = true)
   public List<ChildListResponse> getAllChildren() {
     return childRepository.findAll().stream()
-        .map(child -> ChildListResponse.builder()
-            .id(child.getId())
-            .name(child.getName())
-            .age(child.getAge())
-            .build())
+        .map(child -> new ChildListResponse(
+            child.getId(),
+            child.getName(),
+            child.getAge()
+        ))
         .collect(Collectors.toList());
   }
 
   @Transactional(readOnly = true)
   public List<ChildListResponse> getChildrenByParentId(UUID parentId) {
     return childRepository.findByParentId(parentId).stream()
-        .map(child -> ChildListResponse.builder()
-            .id(child.getId())
-            .name(child.getName())
-            .age(child.getAge())
-            .build())
+        .map(child -> new ChildListResponse(
+            child.getId(),
+            child.getName(),
+            child.getAge()
+        ))
         .collect(Collectors.toList());
   }
 
@@ -142,8 +142,8 @@ public class ChildService {
 
     Child child = Child.builder()
         .parent(parent)
-        .name(request.getName())
-        .age(request.getAge())
+        .name(request.name())
+        .age(request.age())
         .pinHash(null) // No pattern set initially
         .xp(0)
         .pocketMoney(0)
@@ -183,8 +183,8 @@ public class ChildService {
       throw new AccessDeniedException("Access denied: Child does not belong to this parent");
     }
 
-    child.setName(request.getName());
-    child.setAge(request.getAge());
+    child.setName(request.name());
+    child.setAge(request.age());
 
     Child updatedChild = childRepository.save(child);
     return toChildResponse(updatedChild);
@@ -247,14 +247,14 @@ public class ChildService {
   }
 
   private ChildResponse toChildResponse(Child child) {
-    return ChildResponse.builder()
-        .id(child.getId())
-        .name(child.getName())
-        .age(child.getAge())
-        .xp(child.getXp())
-        .pocketMoney(child.getPocketMoney())
-        .allowanceMoney(child.getAllowanceMoney())
-        .hasPattern(child.getPinHash() != null && !child.getPinHash().isEmpty())
-        .build();
+    return new ChildResponse(
+        child.getId(),
+        child.getName(),
+        child.getAge(),
+        child.getXp(),
+        child.getPocketMoney(),
+        child.getAllowanceMoney(),
+        child.getPinHash() != null && !child.getPinHash().isEmpty()
+    );
   }
 }

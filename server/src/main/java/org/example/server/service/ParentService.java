@@ -28,18 +28,18 @@ public class ParentService {
 
   @Transactional
   public AuthResponse registerParent(RegisterParentRequest request) {
-    log.info("Attempting to register parent. Email={}", request.getEmail());
+    log.info("Attempting to register parent. Email={}", request.email());
 
-    if (parentRepository.existsByEmail(request.getEmail())) {
-      log.warn("Registration failed – email already registered: {}", request.getEmail());
+    if (parentRepository.existsByEmail(request.email())) {
+      log.warn("Registration failed – email already registered: {}", request.email());
       throw new DuplicateResourceException("Email already registered");
     }
 
     Parent parent = Parent.builder()
-        .email(request.getEmail())
-        .firstName(request.getFirstName())
-        .lastName(request.getLastName())
-        .passwordHash(passwordEncoder.encode(request.getPassword()))
+        .email(request.email())
+        .firstName(request.firstName())
+        .lastName(request.lastName())
+        .passwordHash(passwordEncoder.encode(request.password()))
         .build();
 
     Parent savedParent = parentRepository.save(parent);
@@ -47,30 +47,30 @@ public class ParentService {
 
     String token = jwtUtil.generateToken(savedParent.getId(), savedParent.getEmail(), "parent");
 
-    return AuthResponse.builder()
-        .id(savedParent.getId())
-        .email(savedParent.getEmail())
-        .firstName(savedParent.getFirstName())
-        .lastName(savedParent.getLastName())
-        .role("parent")
-        .createdAt(savedParent.getCreatedAt())
-        .token(token)
-        .tokenType("Bearer")
-        .build();
+    return new AuthResponse(
+        savedParent.getId(),
+        savedParent.getEmail(),
+        savedParent.getFirstName(),
+        savedParent.getLastName(),
+        "parent",
+        savedParent.getCreatedAt(),
+        token,
+        "Bearer"
+    );
   }
 
   @Transactional(readOnly = true)
   public AuthResponse login(LoginRequest request) {
-    log.info("Login attempt. Email={}", request.getEmail());
+    log.info("Login attempt. Email={}", request.email());
 
-    Parent parent = parentRepository.findByEmail(request.getEmail())
+    Parent parent = parentRepository.findByEmail(request.email())
         .orElseThrow(() -> {
-          log.warn("Login failed – email not found: {}", request.getEmail());
+          log.warn("Login failed – email not found: {}", request.email());
           return new InvalidCredentialsException("Invalid email or password");
         });
 
-    if (!passwordEncoder.matches(request.getPassword(), parent.getPasswordHash())) {
-      log.warn("Login failed – wrong password. Email={}", request.getEmail());
+    if (!passwordEncoder.matches(request.password(), parent.getPasswordHash())) {
+      log.warn("Login failed – wrong password. Email={}", request.email());
       throw new InvalidCredentialsException("Invalid email or password");
     }
 
@@ -78,16 +78,16 @@ public class ParentService {
 
     String token = jwtUtil.generateToken(parent.getId(), parent.getEmail(), "parent");
 
-    return AuthResponse.builder()
-        .id(parent.getId())
-        .email(parent.getEmail())
-        .firstName(parent.getFirstName())
-        .lastName(parent.getLastName())
-        .role("parent")
-        .createdAt(parent.getCreatedAt())
-        .token(token)
-        .tokenType("Bearer")
-        .build();
+    return new AuthResponse(
+        parent.getId(),
+        parent.getEmail(),
+        parent.getFirstName(),
+        parent.getLastName(),
+        "parent",
+        parent.getCreatedAt(),
+        token,
+        "Bearer"
+    );
   }
 
   @Transactional(readOnly = true)
@@ -95,13 +95,13 @@ public class ParentService {
     Parent parent = parentRepository.findById(parentId)
         .orElseThrow(() -> new ResourceNotFoundException("Parent not found"));
 
-    return ParentResponse.builder()
-        .id(parent.getId())
-        .email(parent.getEmail())
-        .firstName(parent.getFirstName())
-        .lastName(parent.getLastName())
-        .createdAt(parent.getCreatedAt())
-        .build();
+    return new ParentResponse(
+        parent.getId(),
+        parent.getEmail(),
+        parent.getFirstName(),
+        parent.getLastName(),
+        parent.getCreatedAt()
+    );
   }
 
   /**

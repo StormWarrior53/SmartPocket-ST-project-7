@@ -1,25 +1,20 @@
 package org.example.server.dto;
 
-import lombok.*;
-
 import java.util.UUID;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class ChildAuthResponse {
-
-    private UUID id;
-    private String name;
-    private int age;
-    private int xp;
-    private int pocketMoney;
-    private int allowanceMoney;
-    private String role;
-    private String token;
-
-    @Builder.Default
-    private String tokenType = "Bearer";
+public record ChildAuthResponse(
+    UUID id,
+    String name,
+    int age,
+    int xp,
+    int pocketMoney,
+    int allowanceMoney,
+    String role,
+    String token,
+    String tokenType) {
+  public ChildAuthResponse(UUID id, String name, int age, int xp,
+      int pocketMoney, int allowanceMoney,
+      String role, String token) {
+    this(id, name, age, xp, pocketMoney, allowanceMoney, role, token, "Bearer");
+  }
 }

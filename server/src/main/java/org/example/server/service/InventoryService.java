@@ -33,14 +33,14 @@ public class InventoryService {
     Child child = childRepository.findById(childId)
         .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
 
-    StoreItem storeItem = storeItemRepository.findById(request.getStoreItemId())
+    StoreItem storeItem = storeItemRepository.findById(request.storeItemId())
         .orElseThrow(() -> new ResourceNotFoundException("Store item not found"));
 
-    if (storeItem.getStock() < request.getQuantity()) {
+    if (storeItem.getStock() < request.quantity()) {
       throw new IllegalArgumentException("Insufficient stock. Available: " + storeItem.getStock());
     }
 
-    int totalCost = storeItem.getPrice() * request.getQuantity();
+    int totalCost = storeItem.getPrice() * request.quantity();
 
     if (child.getPocketMoney() < totalCost) {
       throw new IllegalArgumentException(
@@ -48,23 +48,23 @@ public class InventoryService {
     }
 
     InventoryItem inventoryItem = inventoryItemRepository
-        .findByChildIdAndStoreItemId(childId, request.getStoreItemId())
+        .findByChildIdAndStoreItemId(childId, request.storeItemId())
         .orElse(null);
 
     if (inventoryItem != null) {
-      inventoryItem.setQuantity(inventoryItem.getQuantity() + request.getQuantity());
+      inventoryItem.setQuantity(inventoryItem.getQuantity() + request.quantity());
     } else {
       inventoryItem = InventoryItem.builder()
           .child(child)
           .storeItem(storeItem)
-          .quantity(request.getQuantity())
+          .quantity(request.quantity())
           .pricePaid(storeItem.getPrice())
           .build();
     }
 
     child.setPocketMoney(child.getPocketMoney() - totalCost);
 
-    storeItem.setStock(storeItem.getStock() - request.getQuantity());
+    storeItem.setStock(storeItem.getStock() - request.quantity());
 
     inventoryItem = inventoryItemRepository.save(inventoryItem);
     childRepository.save(child);
