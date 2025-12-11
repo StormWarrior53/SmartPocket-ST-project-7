@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -48,6 +50,10 @@ public class Child {
 
   @Builder.Default
   private int allowanceMoney = 0;
+
+  @OneToMany(mappedBy = "child", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  private List<InventoryItem> inventoryItems = new ArrayList<>();
 
   // Future relationships:
   // List<Enrollment> enrollments

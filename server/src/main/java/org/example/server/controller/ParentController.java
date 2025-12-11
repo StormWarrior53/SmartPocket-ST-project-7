@@ -3,7 +3,9 @@ package org.example.server.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.server.dto.*;
+import org.example.server.dto.inventory.InventoryItemResponse;
 import org.example.server.service.ChildService;
+import org.example.server.service.InventoryService;
 import org.example.server.service.ParentService;
 import org.example.server.util.AuthenticationUtil;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ public class ParentController {
 
     private final ParentService parentService;
     private final ChildService childService;
+    private final InventoryService inventoryService;
     private final AuthenticationUtil authenticationUtil;
 
     @PostMapping("/register")
@@ -97,6 +100,22 @@ public class ParentController {
     public ResponseEntity<ChildResponse> resetPattern(@PathVariable UUID childId) {
         UUID parentId = authenticationUtil.getCurrentUserId();
         ChildResponse response = childService.resetPattern(parentId, childId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me/children/{childId}/inventory")
+    public ResponseEntity<List<InventoryItemResponse>> getChildInventory(@PathVariable UUID childId) {
+        UUID parentId = authenticationUtil.getCurrentUserId();
+        List<InventoryItemResponse> inventory = inventoryService.getChildInventoryForParent(parentId, childId);
+        return ResponseEntity.ok(inventory);
+    }
+
+    @PostMapping("/me/children/{childId}/add-money")
+    public ResponseEntity<ChildResponse> addMoneyToChild(
+            @PathVariable UUID childId,
+            @Valid @RequestBody AddMoneyRequest request) {
+        UUID parentId = authenticationUtil.getCurrentUserId();
+        ChildResponse response = childService.addMoneyToChild(parentId, childId, request.getAmount());
         return ResponseEntity.ok(response);
     }
 }

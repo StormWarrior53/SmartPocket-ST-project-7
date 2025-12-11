@@ -37,7 +37,6 @@ public class ChildService {
         request.getParentName())
         .orElseThrow(() -> new InvalidCredentialsException("Invalid child name, parent name, or pattern"));
 
-    // Validate pattern against stored pinHash
     if (!passwordEncoder.matches(request.getPattern(), child.getPinHash())) {
       throw new InvalidCredentialsException("Invalid child name, parent name, or pattern");
     }
@@ -230,6 +229,21 @@ public class ChildService {
     java.time.Instant expirationTime = expirationDate.toInstant();
 
     tokenBlacklistService.blacklistToken(token, expirationTime, childId, "User logout");
+  }
+
+  @Transactional
+  public ChildResponse addMoneyToChild(UUID parentId, UUID childId, int amount) {
+    Child child = childRepository.findById(childId)
+        .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
+
+    if (!child.getParent().getId().equals(parentId)) {
+      throw new AccessDeniedException("Access denied: Child does not belong to this parent");
+    }
+
+    child.setPocketMoney(child.getPocketMoney() + amount);
+    child = childRepository.save(child);
+
+    return toChildResponse(child);
   }
 
   private ChildResponse toChildResponse(Child child) {
