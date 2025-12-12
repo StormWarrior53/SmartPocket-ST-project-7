@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router"
+import { Link, useParams } from "react-router"
 import { useUser } from "../../context/UserContext.jsx";
 
 export default function RoadmapDetails() {
@@ -7,22 +7,7 @@ export default function RoadmapDetails() {
     const [lecture, setLecture] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [pocketMoneyGiven, setPocketMoneyGiven] = useState(false);
     const { user, isAuthenticated } = useUser();
-
-    useEffect(() => {
-        const given = localStorage.getItem(`pocketMoney_${lectureId}`);
-        if (given) setPocketMoneyGiven(true);
-    }, [lectureId]);
-
-    const handleGivePocketMoney = () => {
-        // Logic to add pocketMoney (static for now)
-        alert("🎉 You received 10 pocketMoney!");
-
-        // Disable button forever
-        setPocketMoneyGiven(true);
-        localStorage.setItem(`pocketMoney_${lectureId}`, "true");
-    };
 
     useEffect(() => {
         setLoading(true);
@@ -41,19 +26,21 @@ export default function RoadmapDetails() {
     if (!lecture) return <p className="p-6">No lecture data available</p>;
 
     return (
-        <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-3xl mt-6">
+        <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-3xl m-6">
             <h1 className="text-3xl font-bold text-blue-900 mb-4">{lecture.title}</h1>
             <p className="text-gray-600 mb-2">Difficulty: {lecture.difficultyLevel}</p>
             <p className="text-gray-800 mb-4">{lecture.description}</p>
 
-            {user && isAuthenticated && <button
-                onClick={handleGivePocketMoney}
-                disabled={pocketMoneyGiven}
-                className={`px-4 py-2 rounded-lg text-white font-semibold ${pocketMoneyGiven ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 hover:bg-green-600"
-                    }`}
-            >
-                {pocketMoneyGiven ? "PocketMoney Received" : "Get PocketMoney"}
+            {user && isAuthenticated && <button>
+                <Link
+                    to={`/quiz/${lecture.id}`}
+                    className="px-4 py-2 bg-blue-600 text-white rounded mr-4"
+                >
+                    Take Quiz
+                </Link>
             </button>}
+
+            <Link to={`/roadmap`} className="px-4 py-2 bg-gray-200 rounded">Back</Link>
 
         </div>
 
