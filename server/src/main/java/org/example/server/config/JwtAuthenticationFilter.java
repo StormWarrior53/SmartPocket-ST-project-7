@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.server.service.TokenBlacklistService;
 import org.example.server.util.JwtUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -34,9 +36,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = extractJwtFromRequest(request);
 
-            if (jwt != null) {
-                if (jwtUtil.validateToken(jwt)) {
-                    UUID userId = jwtUtil.extractUserId(jwt);
+            if (jwt != null && jwtUtil.validateToken(jwt)) {
+                UUID userId = jwtUtil.extractUserId(jwt);
+
+                // Check if token is blacklisted
+                if (tokenBlacklistService.isTokenBlacklisted(jwt) ||
+                    tokenBlacklistService.areAllUserTokensBlacklisted(userId)) {
+                    log.warn("Attempted use of blacklisted token for user: {} at {}", userId, requestURI);
+                    // Don't authenticate - token is revoked
+                } else {
                     String email = jwtUtil.extractEmail(jwt);
 
                     UsernamePasswordAuthenticationToken authentication =
@@ -45,9 +53,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     log.debug("JWT authentication successful for user {} (id={}) at {}", email, userId, requestURI);
-                } else {
-                    log.warn("Invalid JWT token received for request to {}", requestURI);
                 }
+            } else if (jwt != null) {
+                log.warn("Invalid JWT token received for request to {}", requestURI);
             }
         } catch (Exception ex) {
             log.error("JWT authentication failed for request to {}: {}", requestURI, ex.getMessage());

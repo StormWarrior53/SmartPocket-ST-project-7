@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -13,38 +15,47 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
+@Table(name = "child", indexes = {
+    @Index(name = "idx_child_parent_id", columnList = "parent_id")
+}, uniqueConstraints = {
+    @UniqueConstraint(name = "uk_child_parent_name", columnNames = { "parent_id", "name" })
+})
 public class Child {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id", nullable = false)
-    private Parent parent;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "parent_id", nullable = false)
+  private Parent parent;
 
-    @Column(nullable = false)
-    private String name;
+  @Column(nullable = false)
+  private String name;
 
-    @Column(nullable = false)
-    @Min(7)
-    @Max(24)
-    private int age;
+  @Column(nullable = false)
+  @Min(7)
+  @Max(24)
+  private int age;
 
-    @Column(nullable = false)
-    private String pinHash; // PIN acts as the child's password
+  @Column(nullable = true)
+  private String pinHash; // Pattern/PIN acts as the child's password (nullable for first-time setup)
 
-    // Gamification fields
-    @Builder.Default
-    private int xp = 0;
+  // Gamification fields
+  @Builder.Default
+  private int xp = 0;
 
-    @Builder.Default
-    private int pocketMoney = 0;
+  @Builder.Default
+  private int pocketMoney = 0;
 
-    @Builder.Default
-    private int allowanceMoney = 0;
+  @Builder.Default
+  private int allowanceMoney = 0;
 
-    // Future relationships:
-    // List<Enrollment> enrollments
-    // List<Achievement> achievements
+  @OneToMany(mappedBy = "child", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  private List<InventoryItem> inventoryItems = new ArrayList<>();
+
+  // Future relationships:
+  // List<Enrollment> enrollments
+  // List<Achievement> achievements
 }

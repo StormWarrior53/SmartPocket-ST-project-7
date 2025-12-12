@@ -14,13 +14,13 @@ public interface ParentMapper {
         @Override
         public ParentResponse toResponse(Parent parent) {
             if (parent == null) return null;
-            return ParentResponse.builder()
-                    .id(parent.getId())
-                    .email(parent.getEmail())
-                    .firstName(parent.getFirstName())
-                    .lastName(parent.getLastName())
-                    .createdAt(parent.getCreatedAt())
-                    .build();
+            return new ParentResponse(
+                    parent.getId(),
+                    parent.getEmail(),
+                    parent.getFirstName(),
+                    parent.getLastName(),
+                    parent.getCreatedAt()
+            );
         }
     }
 }
