@@ -1,14 +1,15 @@
+import { useUser } from "../../context/UserContext.jsx";
+
 export default function Profile() {
     const parent = {
-        name: "John Doe",
-        email: "john.doe@example.com",
-        profilePic: "/images/profile.png",
         children: [
             { id: 1, name: "Alice", age: 7 },
             { id: 2, name: "Bob", age: 5 },
             { id: 3, name: "Charlie", age: 6 },
         ],
     };
+
+    const { user } = useUser();
 
     const handleCreateChild = () => {
         console.log("Create child clicked");
@@ -22,6 +23,10 @@ export default function Profile() {
         console.log("Add allowance to child", id);
     };
 
+    if (!user) {
+        return <p>Loading...</p>;
+    }
+
     return (
         <section className="min-h-screen bg-white text-slate-800 py-12 px-6 sm:px-12">
             <div className="max-w-5xl mx-auto space-y-8">
@@ -29,12 +34,12 @@ export default function Profile() {
                 {/* Profile Header */}
                 <div className="flex flex-col items-center space-y-4">
                     <img
-                        src={parent.profilePic}
+                        src="/images/profile.png"
                         alt="Profile"
                         className="w-32 h-32 rounded-full border-4 border-blue-100 shadow-sm object-cover"
                     />
-                    <h1 className="text-3xl font-bold text-blue-600">{parent.name}</h1>
-                    <p className="text-slate-700">{parent.email}</p>
+                    <h1 className="text-3xl font-bold text-blue-600">{user.firstName} {user.lastName}</h1>
+                    <p className="text-slate-700">{user.email}</p>
                 </div>
 
                 {/* Children Section */}
@@ -57,7 +62,7 @@ export default function Profile() {
                                 className="flex flex-col items-center bg-blue-50 border border-blue-100 rounded-lg p-4 w-48"
                             >
                                 <img
-                                    src={parent.profilePic}
+                                    src="/images/profile.png"
                                     alt={child.name}
                                     className="w-20 h-20 rounded-full border-2 border-blue-200 object-cover mb-2"
                                 />
