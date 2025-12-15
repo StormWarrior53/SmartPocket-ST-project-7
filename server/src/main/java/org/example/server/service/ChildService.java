@@ -50,6 +50,7 @@ public class ChildService {
         child.getXp(),
         child.getPocketMoney(),
         child.getAllowanceMoney(),
+        child.getParent().getId(),
         "child",
         token,
         "Bearer"
@@ -100,6 +101,7 @@ public class ChildService {
         savedChild.getXp(),
         savedChild.getPocketMoney(),
         savedChild.getAllowanceMoney(),
+        savedChild.getParent().getId(),
         "child",
         token,
         "Bearer"
@@ -254,7 +256,8 @@ public class ChildService {
         child.getXp(),
         child.getPocketMoney(),
         child.getAllowanceMoney(),
-        child.getPinHash() != null && !child.getPinHash().isEmpty()
+        child.getPinHash() != null && !child.getPinHash().isEmpty(),
+        child.getParent().getId()
     );
   }
 }
