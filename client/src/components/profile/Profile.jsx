@@ -1,15 +1,44 @@
+import { useEffect, useState } from "react";
 import { useUser } from "../../context/UserContext.jsx";
+import { Link } from "react-router";
 
 export default function Profile() {
-    const parent = {
-        children: [
-            { id: 1, name: "Alice", age: 7 },
-            { id: 2, name: "Bob", age: 5 },
-            { id: 3, name: "Charlie", age: 6 },
-        ],
-    };
 
-    const { user } = useUser();
+
+
+    const { user, authFetch, loading: userLoading, isAuthenticated } = useUser();
+    const [children, setChildren] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (userLoading) return;          // wait for context to load
+        if (!isAuthenticated) return;     // don't fetch if not logged in
+
+        const fetchChildren = async () => {
+            try {
+                const res = await authFetch("http://localhost:8080/api/parents/me/children");
+
+                if (!res.ok) {
+                    console.error("Failed to fetch children");
+                    return;
+                }
+
+                const data = await res.json();
+                setChildren(data);
+            } catch (e) {
+                console.error("Error fetching children", e);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchChildren();
+    }, [authFetch, userLoading, isAuthenticated]);
+
+    if (loading || userLoading) return <p>Loading...</p>;
+    if (!isAuthenticated) return <p>You must be logged in to view children.</p>;
+
+    // const { user } = useUser();
 
     const handleCreateChild = () => {
         console.log("Create child clicked");
@@ -46,44 +75,32 @@ export default function Profile() {
                 <div className="bg-white border border-blue-100 shadow-sm rounded-2xl p-6">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-2xl font-bold text-blue-600">Children</h2>
-                        <button
-                            onClick={handleCreateChild}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                        >
-                            Create Child
-                        </button>
+                        <Link to="/create-child">
+                            <button
+                                onClick={handleCreateChild}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                            >
+                                Create Child
+                            </button>
+                        </Link>
                     </div>
 
                     {/* Children Cards */}
                     <div className="flex flex-wrap gap-4">
-                        {parent.children.map((child) => (
-                            <div
-                                key={child.id}
-                                className="flex flex-col items-center bg-blue-50 border border-blue-100 rounded-lg p-4 w-48"
-                            >
-                                <img
-                                    src="/images/profile.png"
-                                    alt={child.name}
-                                    className="w-20 h-20 rounded-full border-2 border-blue-200 object-cover mb-2"
-                                />
-                                <p className="font-semibold text-slate-800">{child.name}</p>
-                                <p className="text-slate-600 text-sm mb-2">Age: {child.age}</p>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => handleAllowance(child.id)}
-                                        className="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 text-sm"
-                                    >
-                                        Add Allowance
-                                    </button>
-                                    <button
-                                        onClick={() => handleRemoveChild(child.id)}
-                                        className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 text-sm"
-                                    >
-                                        Remove
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                        <div>
+                            <h2>My Children</h2>
+                            {children.length === 0 ? (
+                                <p>No children found.</p>
+                            ) : (
+                                children.map(child => (
+                                    <div key={child.id} style={{ marginBottom: "10px" }}>
+                                        <strong>Name: {child.name}</strong><br />
+                                        <p>Age: {child.age}</p>
+                                        Balance: {child.allowanceMoney}
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
