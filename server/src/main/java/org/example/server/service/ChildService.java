@@ -32,13 +32,13 @@ public class ChildService {
 
   @Transactional(readOnly = true)
   public ChildAuthResponse login(ChildLoginRequest request) {
-    Child child = childRepository.findByNameAndParentFirstName(
+    Child child = childRepository.findByNameAndParentEmail(
         request.childName(),
-        request.parentName())
-        .orElseThrow(() -> new InvalidCredentialsException("Invalid child name, parent name, or pattern"));
+        request.parentEmail())
+        .orElseThrow(() -> new InvalidCredentialsException("Invalid child name, parent email, or pattern"));
 
     if (!passwordEncoder.matches(request.pattern(), child.getPinHash())) {
-      throw new InvalidCredentialsException("Invalid child name, parent name, or pattern");
+      throw new InvalidCredentialsException("Invalid child name, parent email, or pattern");
     }
 
     String token = jwtUtil.generateToken(child.getId(), child.getName(), "child");
@@ -58,8 +58,8 @@ public class ChildService {
   }
 
   @Transactional(readOnly = true)
-  public CheckNameResponse checkNameExists(String childName, String parentName) {
-    Optional<Child> childOptional = childRepository.findByNameAndParentFirstName(childName, parentName);
+  public CheckNameResponse checkNameExists(String childName, String parentEmail) {
+    Optional<Child> childOptional = childRepository.findByNameAndParentEmail(childName, parentEmail);
 
     if (childOptional.isEmpty()) {
       return new CheckNameResponse(
@@ -81,9 +81,9 @@ public class ChildService {
 
   @Transactional
   public ChildAuthResponse setupPattern(SetupPatternRequest request) {
-    Child child = childRepository.findByNameAndParentFirstName(
+    Child child = childRepository.findByNameAndParentEmail(
         request.childName(),
-        request.parentName()).orElseThrow(() -> new ResourceNotFoundException("Child not found under this parent"));
+        request.parentEmail()).orElseThrow(() -> new ResourceNotFoundException("Child not found under this parent"));
 
     if (child.getPinHash() != null && !child.getPinHash().isEmpty()) {
       throw new DuplicateResourceException("Pattern is already set for this child");

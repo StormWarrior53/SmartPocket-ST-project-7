@@ -21,7 +21,7 @@ public class ChildController {
 
     @PostMapping("/check-name")
     public ResponseEntity<CheckNameResponse> checkName(@Valid @RequestBody CheckNameRequest request) {
-        CheckNameResponse response = childService.checkNameExists(request.childName(), request.parentName());
+        CheckNameResponse response = childService.checkNameExists(request.childName(), request.parentEmail());
         return ResponseEntity.ok(response);
     }
 
