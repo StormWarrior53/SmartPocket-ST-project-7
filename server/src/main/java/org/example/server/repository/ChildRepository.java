@@ -15,5 +15,5 @@ public interface ChildRepository extends JpaRepository<Child, UUID>
 
     Optional<Child> findFirstByName(String name);
 
-    Optional<Child> findByNameAndParentFirstName(String childName, String parentFirstName);
+    Optional<Child> findByNameAndParentEmail(String childName, String parentEmail);
 }
