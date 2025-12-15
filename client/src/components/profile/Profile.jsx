@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/UserContext.jsx";
 import { Link } from "react-router";
+import ChildCard from "./child-card/ChildCard.jsx";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
@@ -15,17 +16,40 @@ export default function Profile() {
 
         const fetchChildren = async () => {
             try {
-                const res = await authFetch("http://localhost:8080/api/parents/me/children");
+                const res = await authFetch(`${API_BASE_URL}/parents/me/children`);
 
                 if (!res.ok) {
                     console.error("Failed to fetch children");
+                    setChildren([]);
                     return;
                 }
 
                 const data = await res.json();
-                setChildren(data);
+
+                // fetch each child's inventory in parallel and attach it
+                if (Array.isArray(data) && data.length > 0) {
+                    const inventories = await Promise.all(
+                        data.map(async (child) => {
+                            try {
+                                const invRes = await authFetch(`${API_BASE_URL}/parents/me/children/${child.id}/inventory`);
+                                if (!invRes.ok) return [];
+                                const inv = await invRes.json();
+                                return Array.isArray(inv) ? inv : [];
+                            } catch (err) {
+                                console.error("Failed to fetch inventory for", child.id, err);
+                                return [];
+                            }
+                        })
+                    );
+
+                    const combined = data.map((c, i) => ({ ...c, inventory: inventories[i] || [] }));
+                    setChildren(combined);
+                } else {
+                    setChildren(Array.isArray(data) ? data.map(c => ({ ...c, inventory: [] })) : []);
+                }
             } catch (e) {
                 console.error("Error fetching children", e);
+                setChildren([]);
             } finally {
                 setLoading(false);
             }
@@ -149,25 +173,12 @@ export default function Profile() {
                                 <p>No children found.</p>
                             ) : (
                                 children.map(child => (
-                                    <div key={child.id} style={{ marginBottom: "10px" }}>
-                                        <strong>Name: {child.name}</strong><br />
-                                        <p>Age: {child.age}</p>
-                                        Balance: {child.allowanceMoney}
-                                        <div className="mt-2">
-                                            <button
-                                                onClick={() => handleAllowance(child.id)}
-                                                className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700"
-                                            >
-                                                Add Allowance
-                                            </button>
-                                            <button
-                                                onClick={() => handleRemoveChild(child.id)}
-                                                className="ml-2 bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700"
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <ChildCard
+                                        key={child.id}
+                                        child={child}
+                                        onAddAllowance={handleAllowance}
+                                        onDelete={handleRemoveChild}
+                                    />
                                 ))
                             )}
                         </div>
