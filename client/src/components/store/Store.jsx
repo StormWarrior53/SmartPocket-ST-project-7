@@ -1,23 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import ItemCard from "./item/ItemCard.jsx";
-
-// const storeItems = [
-//   { id: 1, name: "Sticker Pack", price: 10, emoji: "✨" },
-//   { id: 2, name: "Toy Car", price: 50, emoji: "🚗" },
-//   { id: 3, name: "Story Book", price: 30, emoji: "📚" },
-//   { id: 4, name: "Ice Cream", price: 20, emoji: "🍦" },
-//   { id: 5, name: "Puzzle", price: 40, emoji: "🧩" },
-// ];
+import { useUser } from "../../context/UserContext.jsx";
 
 export default function Store() {
-  const [balance, setBalance] = useState(100); // Kid's coins
+  const [balance, setBalance] = useState(0);
   const [cart, setCart] = useState([]);
   const [storeItems, setStoreItems] = useState([]);
   const navigate = useNavigate();
 
+  const { user, loading } = useUser();
+
   useEffect(() => {
-    const fetchStoreItems = async() => {
+    const fetchStoreItems = async () => {
       try {
         const response = await fetch('http://localhost:8080/api/store');
         if (!response.ok) throw new Error("Failed to fetch store items");
@@ -57,14 +52,17 @@ export default function Store() {
           <p className="mt-2 text-slate-600 text-lg">Use your earned coins to buy fun rewards and show your parents what you've learned!</p>
         </div>
 
+
         <div className="bg-white border border-blue-100 shadow-sm rounded-2xl p-8">
-          <p className="text-lg font-semibold text-center mb-6">
-            Your Balance: {balance} 💰
-          </p>
+          { !loading && user && (user?.role !== 'parent' || user?.role === 'child') &&
+            <p className="text-lg font-semibold text-center mb-6">
+              Your Balance: {balance} 💰
+            </p>
+          }
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {storeItems.map((item) => (
-              <ItemCard key={item.id} item={item} buyItem={buyItem} />
+              <ItemCard key={item.id} item={item} buyItem={buyItem} user={user} />
             ))}
           </div>
         </div>
