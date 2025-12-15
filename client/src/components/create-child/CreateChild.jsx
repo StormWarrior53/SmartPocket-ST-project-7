@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useUser } from "../../context/UserContext.jsx";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+
 export default function CreateChild() {
     const { authFetch } = useUser();
     const navigate = useNavigate();
@@ -26,7 +28,7 @@ export default function CreateChild() {
             setLoading(true);
             setError("");
 
-            const res = await authFetch("http://localhost:8080/api/parents/me/children", {
+            const res = await authFetch(`${API_BASE_URL}/parents/me/children`, {
                 method: "POST",
                 body: JSON.stringify({
                     name: form.name.trim(),      // must be non-empty
@@ -35,7 +37,9 @@ export default function CreateChild() {
             });
 
             if (!res.ok) {
-                setError("Failed to create child.");
+                const errorData = await res.json().catch(() => ({}));
+                const errorMessage = errorData.message || errorData.error || "Failed to create child.";
+                setError(errorMessage);
                 return;
             }
 
