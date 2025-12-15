@@ -53,8 +53,7 @@ public class ChildService {
         child.getParent().getId(),
         "child",
         token,
-        "Bearer"
-    );
+        "Bearer");
   }
 
   @Transactional(readOnly = true)
@@ -65,8 +64,7 @@ public class ChildService {
       return new CheckNameResponse(
           false,
           false,
-          "Child not found under this parent"
-      );
+          "Child not found under this parent");
     }
 
     Child child = childOptional.get();
@@ -75,8 +73,7 @@ public class ChildService {
     return new CheckNameResponse(
         true,
         hasPattern,
-        hasPattern ? "Child found, please enter your pattern" : "Child found, please set up your pattern"
-    );
+        hasPattern ? "Child found, please enter your pattern" : "Child found, please set up your pattern");
   }
 
   @Transactional
@@ -104,8 +101,7 @@ public class ChildService {
         savedChild.getParent().getId(),
         "child",
         token,
-        "Bearer"
-    );
+        "Bearer");
   }
 
   @Transactional(readOnly = true)
@@ -114,8 +110,7 @@ public class ChildService {
         .map(child -> new ChildListResponse(
             child.getId(),
             child.getName(),
-            child.getAge()
-        ))
+            child.getAge()))
         .collect(Collectors.toList());
   }
 
@@ -125,8 +120,7 @@ public class ChildService {
         .map(child -> new ChildListResponse(
             child.getId(),
             child.getName(),
-            child.getAge()
-        ))
+            child.getAge()))
         .collect(Collectors.toList());
   }
 
@@ -242,7 +236,7 @@ public class ChildService {
       throw new AccessDeniedException("Access denied: Child does not belong to this parent");
     }
 
-    child.setPocketMoney(child.getPocketMoney() + amount);
+    child.setAllowanceMoney(child.getAllowanceMoney() + amount);
     child = childRepository.save(child);
 
     return toChildResponse(child);
@@ -257,7 +251,6 @@ public class ChildService {
         child.getPocketMoney(),
         child.getAllowanceMoney(),
         child.getPinHash() != null && !child.getPinHash().isEmpty(),
-        child.getParent().getId()
-    );
+        child.getParent().getId());
   }
 }
