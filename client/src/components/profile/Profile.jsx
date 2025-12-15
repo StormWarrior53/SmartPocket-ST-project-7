@@ -94,8 +94,9 @@ export default function Profile() {
                             ) : (
                                 children.map(child => (
                                     <div key={child.id} style={{ marginBottom: "10px" }}>
-                                        <strong>{child.name}</strong><br />
-                                        Balance: {child.balance}
+                                        <strong>Name: {child.name}</strong><br />
+                                        <p>Age: {child.age}</p>
+                                        Balance: {child.allowanceMoney}
                                     </div>
                                 ))
                             )}
