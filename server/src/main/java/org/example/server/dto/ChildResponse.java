@@ -9,6 +9,7 @@ public record ChildResponse(
     int xp,
     int pocketMoney,
     int allowanceMoney,
-    boolean hasPattern
+    boolean hasPattern,
+    UUID parentId
 ) {
 }
