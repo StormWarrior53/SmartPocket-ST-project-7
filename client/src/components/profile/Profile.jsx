@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "../../context/UserContext.jsx";
 import { Link } from "react-router";
 import ChildCard from "./child-card/ChildCard.jsx";
+import EditChild from "./edit-modal/EditChild.jsx";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
@@ -9,6 +10,9 @@ export default function Profile() {
     const { user, authFetch, loading: userLoading, isAuthenticated } = useUser();
     const [children, setChildren] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const [isEditOpen, setIsEditOpen] = useState(false); // new
+    const [selectedChild, setSelectedChild] = useState(null);
 
     useEffect(() => {
         if (userLoading) return;          // wait for context to load
@@ -132,6 +136,22 @@ export default function Profile() {
         }
     };
 
+    const openEditModal = (child) => {
+        setSelectedChild(child);
+        setIsEditOpen(true);
+    };
+
+    const closeEditModal = () => {
+        setIsEditOpen(false);
+        setSelectedChild(null);
+    };
+
+    // when modal saves, update local children list
+    const handleEditSaved = (updatedChild) => {
+        setChildren(prev => prev.map(c => c.id === updatedChild.id ? updatedChild : c));
+        closeEditModal();
+    };
+
 
     if (!user) {
         return <p>Loading...</p>;
@@ -168,23 +188,40 @@ export default function Profile() {
                     {/* Children Cards */}
                     <div className="flex flex-wrap gap-4">
                         <div>
-                            <h2>My Children</h2>
                             {children.length === 0 ? (
                                 <p>No children found.</p>
                             ) : (
                                 children.map(child => (
-                                    <ChildCard
-                                        key={child.id}
-                                        child={child}
-                                        onAddAllowance={handleAllowance}
-                                        onDelete={handleRemoveChild}
-                                    />
+                                    <div key={child.id} className="relative border p-3 m-5 rounded-lg">
+                                        <ChildCard
+                                            child={child}
+                                            onAddAllowance={handleAllowance}
+                                            onDelete={handleRemoveChild}
+                                        />
+                                        <div className="mt-2 flex gap-2">
+                                            <button
+                                                onClick={() => openEditModal(child)}
+                                                className="bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500"
+                                            >
+                                                Edit
+                                            </button>
+                                        </div>
+                                    </div>
                                 ))
                             )}
                         </div>
                     </div>
                 </div>
             </div>
+
+            {isEditOpen && selectedChild && (
+                <EditChild
+                    child={selectedChild}
+                    authFetch={authFetch}
+                    onClose={closeEditModal}
+                    onSaved={handleEditSaved}
+                />
+            )}
         </section>
     );
 }
