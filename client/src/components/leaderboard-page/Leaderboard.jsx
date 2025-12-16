@@ -4,7 +4,7 @@ import { useUser } from "../../context/UserContext.jsx";
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 export default function Leaderboard() {
-    const { authFetch, loading: userLoading } = useUser();
+    const { authFetch, loading: userLoading, user: currentUser } = useUser();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -71,16 +71,29 @@ export default function Leaderboard() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.map((user, index) => (
-                                    <tr
-                                        key={user.id ?? index}
-                                        className={index % 2 === 0 ? "bg-white" : "bg-blue-50"}
-                                    >
-                                        <td className="px-4 py-2 font-medium">{index + 1}</td>
-                                        <td className="px-4 py-2">{user.name ?? `${user.firstName ?? ""} ${user.lastName ?? ""}`}</td>
-                                        <td className="px-4 py-2 font-semibold text-blue-600">{user.xp ?? 0}</td>
-                                    </tr>
-                                ))}
+                                {users.map((user, index) => {
+                                    const displayName = user.name ?? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
+                                    const isMe =
+                                        (currentUser?.id && user.id === currentUser.id) ||
+                                        (!!currentUser?.name && displayName?.toLowerCase() === currentUser.name?.toLowerCase());
+
+                                    const rowClass = isMe
+                                        ? "bg-blue-100/70 text-blue-900 ring-1 ring-blue-300"
+                                        : index % 2 === 0
+                                            ? "bg-white"
+                                            : "bg-blue-50";
+
+                                    return (
+                                        <tr
+                                            key={user.id ?? index}
+                                            className={`transition ${rowClass}`}
+                                        >
+                                            <td className="px-4 py-2 font-medium">{index + 1}</td>
+                                            <td className="px-4 py-2 font-semibold">{displayName || "Unnamed"}</td>
+                                            <td className="px-4 py-2 font-semibold text-blue-600">{user.xp ?? 0}</td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     )}
