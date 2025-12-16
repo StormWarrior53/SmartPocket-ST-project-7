@@ -60,13 +60,6 @@ export default function LeaderboardBadges() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {/* {topUsers.map((user, index) => (
-                                    <tr key={user.id ?? index} className={index % 2 === 0 ? "bg-white" : "bg-blue-50"}>
-                                        <td className="px-4 py-2 font-medium">{index + 1}</td>
-                                        <td className="px-4 py-2">{user.name ?? `${user.firstName ?? ""} ${user.lastName ?? ""}`}</td>
-                                        <td className="px-4 py-2 font-semibold text-blue-600">{user.xp ?? 0}</td>
-                                    </tr>
-                                ))} */}
                                 {topUsers.map((user, index) => {
                                     const displayName = user.name ?? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
                                     const isMe =
