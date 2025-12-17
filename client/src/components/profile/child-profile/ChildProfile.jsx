@@ -127,27 +127,27 @@ export default function ChildProfile() {
                     ) : inventory.length === 0 ? (
                         <p>No items in inventory.</p>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {inventory.map((item, idx) => (
-                                <div key={item.id || idx} className="border rounded-lg p-4">
-                                    <h3 className="font-semibold text-blue-600">
-                                        {item.name || item.productName || `Item ${idx + 1}`}
-                                    </h3>
-                                    {"quantity" in item && (
-                                        <p className="text-slate-700 mt-1">Quantity: {item.quantity}</p>
-                                    )}
-                                    {"price" in item && (
-                                        <p className="text-slate-700">Price: {item.price}</p>
-                                    )}
-                                    <details className="mt-2">
-                                        <summary className="text-sm text-slate-500">Details</summary>
-                                        <pre className="text-xs bg-slate-50 p-2 rounded border mt-1 overflow-x-auto">
-                                            {JSON.stringify(item, null, 2)}
-                                        </pre>
-                                    </details>
-                                </div>
-                            ))}
-                        </div>
+                        <ul className="space-y-2">
+                            {inventory.map((item, idx) => {
+                                const name =
+                                    item.name ||
+                                    item.productName ||
+                                    item.storeItem?.name ||
+                                    `Item ${idx + 1}`;
+                                const price =
+                                    item.price ??
+                                    item.pricePaid ??
+                                    item.storeItem?.price ??
+                                    null;
+
+                                return (
+                                    <li key={item.id || idx} className="flex justify-between border rounded-lg p-3">
+                                        <span className="font-semibold text-blue-600">{name}</span>
+                                        <span className="text-slate-700">{price != null ? `${price} 💰` : '—'}</span>
+                                    </li>
+                                );
+                            })}
+                        </ul>
                     )}
                 </div>
             </div>
