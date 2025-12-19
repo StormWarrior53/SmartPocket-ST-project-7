@@ -272,6 +272,20 @@ public class ChildService {
         return toChildResponse(updated);
     }
 
+    @Transactional
+    public ChildResponse patchXpMe(UUID childId, int amount) {
+        Child child = childRepository.findById(childId)
+                .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
+
+        if (amount < 0) {
+            throw new IllegalArgumentException("XP amount must be non-negative");
+        }
+
+        child.setXp(child.getXp() + amount);
+        Child updated = childRepository.save(child);
+        return toChildResponse(updated);
+    }
+
 
 //    -------------------
 

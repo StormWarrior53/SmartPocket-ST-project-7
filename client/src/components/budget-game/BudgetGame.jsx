@@ -76,6 +76,7 @@ export default function BudgetGame() {
     const budgetBelowPlayMin = useMemo(() => startingBudget < MIN_PLAY_BUDGET, [startingBudget]);
 
     const format = (n) => `€${(Number(n) || 0).toFixed(0)}`;
+    const toPercent = (rate) => Math.max(0, Math.round((rate || 0) * 100));
 
     const patchJson = async (url, payload) => {
         const res = await authFetch(url, {
@@ -93,7 +94,7 @@ export default function BudgetGame() {
         return data;
     };
 
-    const persistResults = async (win, remainingAllowance) => {
+    const persistResults = async (win, remainingAllowance, savingsRate) => {
         const messages = [];
         const safeRemaining = Math.max(0, Math.round(remainingAllowance));
 
@@ -105,6 +106,14 @@ export default function BudgetGame() {
         }
 
         if (win) {
+            const xpToAdd = toPercent(savingsRate); // percent saved => XP
+            try {
+                await patchJson(`${API_BASE_URL}/children/me/xp`, { xp: xpToAdd });
+                messages.push(`XP gained: +${xpToAdd}.`);
+            } catch (e) {
+                messages.push(`Failed to add XP: ${e.message}.`);
+            }
+
             try {
                 await patchJson(`${API_BASE_URL}/children/me/pocket`, { amount: 25 });
                 messages.push(`Prize added: ${format(25)} to pocket money.`);
@@ -112,8 +121,9 @@ export default function BudgetGame() {
                 messages.push(`Failed to add prize: ${e.message}.`);
             }
         }
+
         return messages.join(' ');
-    }
+    };
 
     // Fetch child balance and prepare budget
     const loadBudget = async () => {
@@ -257,7 +267,7 @@ export default function BudgetGame() {
         const win = finalSavings >= 0 && finalRate >= MIN_SAVINGS_RATE;
 
         // Persist to API
-        const persistMsg = await persistResults(win, finalSavings);
+        const persistMsg = await persistResults(win, finalSavings, finalRate);
 
         setModal({
             open: true,
@@ -273,10 +283,10 @@ export default function BudgetGame() {
         });
     };
 
-    const handleModalClose = () => { 
+    const handleModalClose = () => {
         setModal((m) => ({ ...m, open: false }));
         if (modal.result === 'win' || modal.result === 'lose') {
-            navigate('/games'); 
+            navigate('/games');
         }
     };
 
