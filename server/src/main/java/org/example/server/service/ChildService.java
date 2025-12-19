@@ -106,11 +106,14 @@ public class ChildService {
 
     @Transactional(readOnly = true)
     public List<ChildListResponse> getAllChildren() {
-        return childRepository.findAll().stream()
+        return childRepository.findAll()
+                .stream()
                 .map(child -> new ChildListResponse(
                         child.getId(),
                         child.getName(),
-                        child.getAge()))
+                        child.getAge(),
+                        child.getXp()
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -120,7 +123,9 @@ public class ChildService {
                 .map(child -> new ChildListResponse(
                         child.getId(),
                         child.getName(),
-                        child.getAge()))
+                        child.getAge(),
+                        child.getXp()
+                ))
                 .collect(Collectors.toList());
     }
 
