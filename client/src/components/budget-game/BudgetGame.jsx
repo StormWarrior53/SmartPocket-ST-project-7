@@ -1,22 +1,25 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useUser } from '../../context/UserContext';
+
 import Modal from './modal/Modal.jsx';
 import Card from './card/Card.jsx';
 import Progress from './progress/Progress.jsx';
 import SummaryRow from './summary-row/SummaryRow.jsx';
 import SliderRow from './slider-row/SliderRow.jsx';
 import MiniSlider from './mini-slider/MiniSlider.jsx';
+import { useNavigate } from 'react-router';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 export default function BudgetGame() {
-    const { user, authFetch, isAuthenticated } = useUser();
+    const { authFetch, isAuthenticated } = useUser();
 
     // UI state
     const [loading, setLoading] = useState(true);
     const [fetchError, setFetchError] = useState('');
     const [startingBudget, setStartingBudget] = useState(0);
     const [monthReady, setMonthReady] = useState(false);
+    const navigate = useNavigate();
 
     // Game constants
     const MIN_SAVINGS_RATE = 0.2;         // 20%
@@ -27,6 +30,7 @@ export default function BudgetGame() {
     const MIN_ELECTRICITY = 20;
     const MIN_WATER = 15;
     const MIN_GAS = 15;
+    const MIN_PLAY_BUDGET = 500;
 
     // Other categories can be 0 by default
     const [alloc, setAlloc] = useState({
@@ -68,6 +72,8 @@ export default function BudgetGame() {
         if (!startingBudget) return false;
         return (essentialMinTotal + requiredSavings) > startingBudget;
     }, [startingBudget]);
+
+    const budgetBelowPlayMin = useMemo(() => startingBudget < MIN_PLAY_BUDGET, [startingBudget]);
 
     const format = (n) => `€${(Number(n) || 0).toFixed(0)}`;
 
@@ -227,7 +233,20 @@ export default function BudgetGame() {
         });
     };
 
-    const disabled = loading || !!fetchError || !monthReady;
+    const handleModalClose = () => { // <-- add
+        setModal((m) => ({ ...m, open: false }));
+        if (modal.result === 'win' || modal.result === 'lose') {
+            navigate('/games'); // adjust if your route differs
+        }
+    };
+
+    const disabled = loading || !!fetchError || !monthReady || budgetBelowPlayMin;
+    const modalImage =
+        modal.result === 'win'
+            ? '/images/games-win.png'
+            : modal.result === 'lose'
+                ? '/images/games-lose.png'
+                : null;
 
     return (
         <section
@@ -261,7 +280,21 @@ export default function BudgetGame() {
                         </div>
                     )}
 
-                    {!loading && !fetchError && monthReady && (
+                    {!loading && !fetchError && monthReady && budgetBelowPlayMin && (
+                        <div className="mt-6 p-4 bg-amber-100 border border-amber-300 text-amber-900 rounded-xl">
+                            Your starting budget is below €{MIN_PLAY_BUDGET}. You can’t play this time. Ask your parents to increase your allowance.
+                            <div className="mt-3">
+                                <button
+                                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
+                                    onClick={() => navigate('/games')}
+                                >
+                                    Back to Games
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {!loading && !fetchError && monthReady && !budgetBelowPlayMin && (
                         <>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                                 <div className="md:col-span-2">
@@ -404,6 +437,14 @@ export default function BudgetGame() {
                                             <li>Entertainment can be fun, but don’t overspend.</li>
                                         </ul>
                                     </Card>
+
+                                    <div className="hidden md:flex items-center justify-center pt-5">
+                                        <img
+                                            src="/images/games-thinking.png"
+                                            alt="Boy thinking"
+                                            className="w-full h-auto rounded-2xl shadow-xl"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </>
@@ -412,9 +453,26 @@ export default function BudgetGame() {
             </div>
 
             {modal.open && (
-                <Modal onClose={() => setModal((m) => ({ ...m, open: false }))}>
-                    <h3 className="text-xl font-bold">{modal.title}</h3>
-                    <pre className="whitespace-pre-wrap mt-2 text-slate-800">{modal.message}</pre>
+                <Modal onClose={handleModalClose}>
+                    {modalImage && (
+                        <div className="flex items-start gap-4 mb-3">
+                            <img
+                                src={modalImage}
+                                alt={modal.result === 'win' ? 'Happy boy' : 'Sad boy'}
+                                className="w-28 h-auto rounded-xl shadow-sm"
+                            />
+                            <div className="flex-1">
+                                <h3 className="text-xl font-bold">{modal.title}</h3>
+                                <pre className="whitespace-pre-wrap mt-2 text-slate-800">{modal.message}</pre>
+                            </div>
+                        </div>
+                    )}
+                    {!modalImage && (
+                        <>
+                            <h3 className="text-xl font-bold">{modal.title}</h3>
+                            <pre className="whitespace-pre-wrap mt-2 text-slate-800">{modal.message}</pre>
+                        </>
+                    )}
                     {modal.result === 'win' && (
                         <div className="mt-3 inline-block px-3 py-1 rounded-full bg-green-100 text-green-800 border border-green-300">
                             You Win
@@ -428,7 +486,7 @@ export default function BudgetGame() {
                     <div className="mt-4 flex justify-end">
                         <button
                             className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
-                            onClick={() => setModal((m) => ({ ...m, open: false }))}
+                            onClick={handleModalClose}
                         >
                             Close
                         </button>
