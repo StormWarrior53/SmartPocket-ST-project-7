@@ -77,6 +77,44 @@ export default function BudgetGame() {
 
     const format = (n) => `€${(Number(n) || 0).toFixed(0)}`;
 
+    const patchJson = async (url, payload) => {
+        const res = await authFetch(url, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        const ct = res.headers.get('content-type') || '';
+        const isJson = ct.includes('application/json');
+        const data = isJson ? await res.json() : await res.text();
+        if (!res.ok) {
+            const msg = isJson ? (data?.message || data?.error || 'Request failed') : 'Request failed';
+            throw new Error(msg);
+        }
+        return data;
+    };
+
+    const persistResults = async (win, remainingAllowance) => {
+        const messages = [];
+        const safeRemaining = Math.max(0, Math.round(remainingAllowance));
+
+        try {
+            await patchJson(`${API_BASE_URL}/children/me/allowance`, { amount: safeRemaining });
+            messages.push(`Saved allowance: ${format(safeRemaining)}.`);
+        } catch (e) {
+            messages.push(`Failed to save allowance: ${e.message}.`);
+        }
+
+        if (win) {
+            try {
+                await patchJson(`${API_BASE_URL}/children/me/pocket`, { amount: 25 });
+                messages.push(`Prize added: ${format(25)} to pocket money.`);
+            } catch (e) {
+                messages.push(`Failed to add prize: ${e.message}.`);
+            }
+        }
+        return messages.join(' ');
+    }
+
     // Fetch child balance and prepare budget
     const loadBudget = async () => {
         if (!isAuthenticated) {
@@ -191,7 +229,7 @@ export default function BudgetGame() {
         };
     };
 
-    const onDone = () => {
+    const onDone = async () => {
         const issues = validateMinimums();
         if (issues.length) {
             setModal({
@@ -203,7 +241,6 @@ export default function BudgetGame() {
             return;
         }
 
-        // Must not overspend
         if (startingBudget - totalExpenses < 0) {
             setModal({
                 open: true,
@@ -214,12 +251,14 @@ export default function BudgetGame() {
             return;
         }
 
-        // Run event and compute final savings and outcome
         const evt = runRandomEvent(startingBudget - totalExpenses);
         const finalSavings = evt.after;
         const finalRate = startingBudget ? finalSavings / startingBudget : 0;
-
         const win = finalSavings >= 0 && finalRate >= MIN_SAVINGS_RATE;
+
+        // Persist to API
+        const persistMsg = await persistResults(win, finalSavings);
+
         setModal({
             open: true,
             title: evt.title,
@@ -228,7 +267,8 @@ export default function BudgetGame() {
                 `Final savings: ${format(finalSavings)} (${Math.round(finalRate * 100)}%).\n` +
                 (win
                     ? 'You met the 20% savings goal. You win!'
-                    : 'You did not meet the 20% savings goal. You lose.'),
+                    : 'You did not meet the 20% savings goal. You lose.') +
+                `\n\n${persistMsg}`,
             result: win ? 'win' : 'lose',
         });
     };
