@@ -273,7 +273,7 @@ export default function BudgetGame() {
         });
     };
 
-    const handleModalClose = () => { // <-- add
+    const handleModalClose = () => { 
         setModal((m) => ({ ...m, open: false }));
         if (modal.result === 'win' || modal.result === 'lose') {
             navigate('/games'); // adjust if your route differs
