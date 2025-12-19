@@ -14,6 +14,7 @@ import RoadmapDetails from "./components/roadmap-details/RoadmapDetails.jsx"
 import Games from "./components/games-page/Games.jsx"
 import Quiz from "./components/quiz-page/Quiz.jsx"
 import CreateChild from "./components/create-child/CreateChild.jsx"
+import BudgetGame from "./components/budget-game/BudgetGame.jsx"
 function App() {
 
     return (
@@ -31,6 +32,7 @@ function App() {
                 <Route path="/roadmap/:lectureId" element={<RoadmapDetails />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/games" element={<Games />} />
+                <Route path="budget-game" element={<BudgetGame />} />
                 <Route path="/quiz/:id" element={<Quiz />} />
 
                 <Route path="/create-child" element={<CreateChild />} />
