@@ -17,7 +17,7 @@ export default function LeaderboardBadges() {
             setLoading(true);
             setError("");
             try {
-                const res = await authFetch(`${API_BASE_URL}/children`);
+                const res = await authFetch(`${API_BASE_URL}/children/leaderboard`);
                 if (!res.ok) {
                     const err = await res.json().catch(() => ({}));
                     setError(err.message || "Failed to fetch children.");
