@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { childApi, ApiError } from "../../../services/api";
 import { useUser } from "../../../context/UserContext";
 import { useNavigate } from "react-router";
@@ -15,7 +15,20 @@ export default function ChildLogin() {
     const [apiError, setApiError] = useState("");
     const [loading, setLoading] = useState(false);
     const [setupMode, setSetupMode] = useState(true); // First-time setup toggle
+    const [logoutMessage, setLogoutMessage] = useState("");
     const gridRef = useRef(null);
+
+    useEffect(() => {
+        const reason = sessionStorage.getItem('logoutReason');
+        if (reason) {
+            const messages = {
+                'expired': 'Your session has expired. Please log in again.',
+                'server-rejected': 'Your session is no longer valid. Please log in again.',
+            };
+            setLogoutMessage(messages[reason] || 'Please log in to continue.');
+            sessionStorage.removeItem('logoutReason');
+        }
+    }, []);
 
     const changeHandler = (e) => {
         setData((state) => ({ ...state, [e.target.name]: e.target.value }));
@@ -120,6 +133,8 @@ export default function ChildLogin() {
                     {setupMode ? "Switch to Login" : "First-time Setup"}
                 </button>
             </div>
+
+            {logoutMessage && <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded">{logoutMessage}</div>}
 
             {apiError && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{apiError}</div>}
 

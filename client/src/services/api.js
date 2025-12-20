@@ -9,6 +9,12 @@ class ApiError extends Error {
     }
 }
 
+let logoutCallback = null;
+
+export function setApiLogoutCallback(callback) {
+    logoutCallback = callback;
+}
+
 async function request(url, options = {}) {
     const res = await fetch(url, {
         headers: { "Content-Type": "application/json", ...(options.headers || {}) },
@@ -31,6 +37,14 @@ async function handleResponse(response) {
     if (!response.ok) {
         const message = data.message || data.error || 'An error occurred';
         const errors = data.errors || null;
+
+        // Handle authentication errors
+        if (response.status === 401 || response.status === 403) {
+            if (logoutCallback) {
+                logoutCallback('server-rejected');
+            }
+        }
+
         throw new ApiError(message, response.status, errors);
     }
 
