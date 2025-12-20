@@ -130,6 +130,19 @@ public class ChildService {
   }
 
   @Transactional(readOnly = true)
+  public List<ChildListResponse> getLeaderboard() {
+    return childRepository.findAll()
+        .stream()
+        .sorted((c1, c2) -> Integer.compare(c2.getXp(), c1.getXp()))
+        .map(child -> new ChildListResponse(
+            child.getId(),
+            child.getName(),
+            child.getAge(),
+            child.getXp()))
+        .collect(Collectors.toList());
+  }
+
+  @Transactional(readOnly = true)
   public List<ChildListResponse> getChildrenByParentId(UUID parentId) {
     return childRepository.findByParentId(parentId).stream()
         .map(child -> new ChildListResponse(
