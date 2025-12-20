@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const UserContext = createContext(null);
 
@@ -19,15 +19,31 @@ export function UserProvider({ children }) {
         setLoading(false);
     }, []);
 
+    const isTokenExpired = useCallback(() => {
+        if (!user?.expiresAt) return false;
+        return Date.now() >= user.expiresAt;
+    }, [user]);
+
     const login = (userData) => {
-        // userData is expected to include token and tokenType ("Bearer")
+        // Validate that expiresAt is present and in the future
+        if (!userData.expiresAt) {
+            console.warn('Login response missing expiresAt timestamp');
+        }
+        if (userData.expiresAt && userData.expiresAt <= Date.now()) {
+            console.error('Received expired token from server');
+            return;
+        }
+
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
     };
 
-    const logout = () => {
+    const logout = (reason = null) => {
         setUser(null);
         localStorage.removeItem('user');
+        if (reason) {
+            sessionStorage.setItem('logoutReason', reason);
+        }
     };
 
     // Build Authorization header from stored user
@@ -54,6 +70,7 @@ export function UserProvider({ children }) {
         login,
         logout,
         isAuthenticated: !!user,
+        isTokenExpired,
         loading,
         authHeaders,
         authFetch,

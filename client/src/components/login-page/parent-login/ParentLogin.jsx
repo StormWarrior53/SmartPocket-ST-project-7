@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { authApi, ApiError } from "../../../services/api";
 import { useUser } from "../../../context/UserContext";
@@ -24,6 +24,19 @@ export default function ParentLogin() {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [apiError, setApiError] = useState("");
+    const [logoutMessage, setLogoutMessage] = useState("");
+
+    useEffect(() => {
+        const reason = sessionStorage.getItem('logoutReason');
+        if (reason) {
+            const messages = {
+                'expired': 'Your session has expired. Please log in again.',
+                'server-rejected': 'Your session is no longer valid. Please log in again.',
+            };
+            setLogoutMessage(messages[reason] || 'Please log in to continue.');
+            sessionStorage.removeItem('logoutReason');
+        }
+    }, []);
 
     const changeHandler = (e) => {
         setData((state) => ({ ...state, [e.target.name]: e.target.value }));
@@ -61,6 +74,8 @@ export default function ParentLogin() {
     return (
         <form className="bg-white p-8 rounded-xl shadow-lg space-y-6" onSubmit={submitAction}>
             <h2 className="text-3xl font-bold text-center text-blue-600">Parent Login</h2>
+
+            {logoutMessage && <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded">{logoutMessage}</div>}
 
             {apiError && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{apiError}</div>}
 
