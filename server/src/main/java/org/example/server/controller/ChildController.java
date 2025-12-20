@@ -68,4 +68,33 @@ public class ChildController {
         List<ChildListResponse> children = childService.getChildrenByParentId(parentId);
         return ResponseEntity.ok(children);
     }
+
+//    ------------
+
+    @PatchMapping("/me/allowance")
+    public ResponseEntity<ChildResponse> patchMyAllowance(
+            @Valid @RequestBody PatchMoneyRequestDTO request) {
+
+        UUID childId = authenticationUtil.getCurrentUserId();
+        ChildResponse response = childService.patchAllowanceMoneyMe(childId, request.amount());
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/me/pocket")
+    public ResponseEntity<ChildResponse> patchMyPocket(
+            @Valid @RequestBody PatchMoneyRequestDTO request) {
+
+        UUID childId = authenticationUtil.getCurrentUserId();
+        ChildResponse response = childService.patchPocketMoneyMe(childId, request.amount());
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/me/xp")
+    public ResponseEntity<ChildResponse> patchMyXp(
+            @Valid @RequestBody PatchXpRequestDTO request) {
+
+        UUID childId = authenticationUtil.getCurrentUserId();
+        ChildResponse response = childService.patchXpMe(childId, request.xp());
+        return ResponseEntity.ok(response);
+    }
 }
