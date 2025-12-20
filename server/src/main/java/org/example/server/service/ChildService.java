@@ -1,7 +1,19 @@
 package org.example.server.service;
 
-import lombok.RequiredArgsConstructor;
-import org.example.server.dto.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.example.server.dto.CheckNameResponse;
+import org.example.server.dto.ChildAuthResponse;
+import org.example.server.dto.ChildListResponse;
+import org.example.server.dto.ChildLoginRequest;
+import org.example.server.dto.ChildResponse;
+import org.example.server.dto.CreateChildRequest;
+import org.example.server.dto.SetupPatternRequest;
+import org.example.server.dto.UpdateChildRequest;
 import org.example.server.exception.AccessDeniedException;
 import org.example.server.exception.DuplicateResourceException;
 import org.example.server.exception.InvalidCredentialsException;
@@ -15,10 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +51,8 @@ public class ChildService {
     }
 
     String token = jwtUtil.generateToken(child.getId(), child.getName(), "child");
+    java.util.Date expirationDate = jwtUtil.getExpirationDate(token);
+    Long expiresAt = expirationDate.getTime();
 
     return new ChildAuthResponse(
         child.getId(),
@@ -53,7 +64,7 @@ public class ChildService {
         child.getParent().getId(),
         "child",
         token,
-        "Bearer");
+        expiresAt);
   }
 
   @Transactional(readOnly = true)
@@ -90,6 +101,8 @@ public class ChildService {
     Child savedChild = childRepository.save(child);
 
     String token = jwtUtil.generateToken(savedChild.getId(), savedChild.getName(), "child");
+    Date expirationDate = jwtUtil.getExpirationDate(token);
+    Long expiresAt = expirationDate.getTime();
 
     return new ChildAuthResponse(
         savedChild.getId(),
@@ -101,16 +114,31 @@ public class ChildService {
         savedChild.getParent().getId(),
         "child",
         token,
-        "Bearer");
+        expiresAt);
   }
 
   @Transactional(readOnly = true)
   public List<ChildListResponse> getAllChildren() {
-    return childRepository.findAll().stream()
+    return childRepository.findAll()
+        .stream()
         .map(child -> new ChildListResponse(
             child.getId(),
             child.getName(),
-            child.getAge()))
+            child.getAge(),
+            child.getXp()))
+        .collect(Collectors.toList());
+  }
+
+  @Transactional(readOnly = true)
+  public List<ChildListResponse> getLeaderboard() {
+    return childRepository.findAll()
+        .stream()
+        .sorted((c1, c2) -> Integer.compare(c2.getXp(), c1.getXp()))
+        .map(child -> new ChildListResponse(
+            child.getId(),
+            child.getName(),
+            child.getAge(),
+            child.getXp()))
         .collect(Collectors.toList());
   }
 
@@ -120,7 +148,8 @@ public class ChildService {
         .map(child -> new ChildListResponse(
             child.getId(),
             child.getName(),
-            child.getAge()))
+            child.getAge(),
+            child.getXp()))
         .collect(Collectors.toList());
   }
 
@@ -241,6 +270,52 @@ public class ChildService {
 
     return toChildResponse(child);
   }
+
+  // ---------------
+
+  @Transactional
+  public ChildResponse patchAllowanceMoneyMe(UUID childId, int newAllowanceMoney) {
+    Child child = childRepository.findById(childId)
+        .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
+
+    if (newAllowanceMoney < 0) {
+      throw new IllegalArgumentException("Allowance money must be non-negative");
+    }
+
+    child.setAllowanceMoney(newAllowanceMoney);
+    Child updated = childRepository.save(child);
+    return toChildResponse(updated);
+  }
+
+  @Transactional
+  public ChildResponse patchPocketMoneyMe(UUID childId, int amount) {
+    Child child = childRepository.findById(childId)
+        .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
+
+    if (amount < 0) {
+      throw new IllegalArgumentException("Amount must be non-negative");
+    }
+
+    child.setPocketMoney(child.getPocketMoney() + amount);
+    Child updated = childRepository.save(child);
+    return toChildResponse(updated);
+  }
+
+  @Transactional
+  public ChildResponse patchXpMe(UUID childId, int amount) {
+    Child child = childRepository.findById(childId)
+        .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
+
+    if (amount < 0) {
+      throw new IllegalArgumentException("XP amount must be non-negative");
+    }
+
+    child.setXp(child.getXp() + amount);
+    Child updated = childRepository.save(child);
+    return toChildResponse(updated);
+  }
+
+  // -------------------
 
   private ChildResponse toChildResponse(Child child) {
     return new ChildResponse(

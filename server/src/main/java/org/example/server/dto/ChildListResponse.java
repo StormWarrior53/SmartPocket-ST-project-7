@@ -5,6 +5,7 @@ import java.util.UUID;
 public record ChildListResponse(
     UUID id,
     String name,
-    int age
+    int age,
+    int xp
 ) {
 }

@@ -1,7 +1,7 @@
 package org.example.server.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Date;
+
 import org.example.server.dto.AuthResponse;
 import org.example.server.dto.LoginRequest;
 import org.example.server.dto.ParentResponse;
@@ -15,6 +15,9 @@ import org.example.server.util.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -46,6 +49,8 @@ public class ParentService {
     log.info("Parent registered successfully. ParentId={}", savedParent.getId());
 
     String token = jwtUtil.generateToken(savedParent.getId(), savedParent.getEmail(), "parent");
+    Date expirationDate = jwtUtil.getExpirationDate(token);
+    Long expiresAt = expirationDate.getTime();
 
     return new AuthResponse(
         savedParent.getId(),
@@ -55,8 +60,7 @@ public class ParentService {
         "parent",
         savedParent.getCreatedAt(),
         token,
-        "Bearer"
-    );
+        expiresAt);
   }
 
   @Transactional(readOnly = true)
@@ -77,6 +81,8 @@ public class ParentService {
     log.info("Login successful. ParentId={}", parent.getId());
 
     String token = jwtUtil.generateToken(parent.getId(), parent.getEmail(), "parent");
+    Date expirationDate = jwtUtil.getExpirationDate(token);
+    Long expiresAt = expirationDate.getTime();
 
     return new AuthResponse(
         parent.getId(),
@@ -86,8 +92,7 @@ public class ParentService {
         "parent",
         parent.getCreatedAt(),
         token,
-        "Bearer"
-    );
+        expiresAt);
   }
 
   @Transactional(readOnly = true)
@@ -100,8 +105,7 @@ public class ParentService {
         parent.getEmail(),
         parent.getFirstName(),
         parent.getLastName(),
-        parent.getCreatedAt()
-    );
+        parent.getCreatedAt());
   }
 
   /**

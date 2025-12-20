@@ -16,7 +16,7 @@ export default function Leaderboard() {
             setLoading(true);
             setError("");
             try {
-                const res = await authFetch(`${API_BASE_URL}/children`);
+                const res = await authFetch(`${API_BASE_URL}/children/leaderboard`);
                 if (!res.ok) {
                     const errData = await res.json().catch(() => ({}));
                     setError(errData.message || "Failed to fetch children.");

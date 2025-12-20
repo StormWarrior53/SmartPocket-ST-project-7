@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router"
+import { useEffect } from 'react'
 import About from "./components/about-page/About.jsx"
 import Footer from "./components/footer/Footer.jsx"
 import Header from "./components/header/Header.jsx"
@@ -14,7 +15,18 @@ import RoadmapDetails from "./components/roadmap-details/RoadmapDetails.jsx"
 import Games from "./components/games-page/Games.jsx"
 import Quiz from "./components/quiz-page/Quiz.jsx"
 import CreateChild from "./components/create-child/CreateChild.jsx"
+import BudgetGame from "./components/budget-game/BudgetGame.jsx"
+import { useTokenExpiration } from './hooks/useTokenExpiration'
+import { setApiLogoutCallback } from './services/api'
+
 function App() {
+    const { handleExpiredToken } = useTokenExpiration(5); // 5-minute warning
+
+    // Set up API interceptor callback
+    useEffect(() => {
+        setApiLogoutCallback(handleExpiredToken);
+        return () => setApiLogoutCallback(null);
+    }, [handleExpiredToken]);
 
     return (
         <>
@@ -31,6 +43,7 @@ function App() {
                 <Route path="/roadmap/:lectureId" element={<RoadmapDetails />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/games" element={<Games />} />
+                <Route path="budget-game" element={<BudgetGame />} />
                 <Route path="/quiz/:id" element={<Quiz />} />
 
                 <Route path="/create-child" element={<CreateChild />} />

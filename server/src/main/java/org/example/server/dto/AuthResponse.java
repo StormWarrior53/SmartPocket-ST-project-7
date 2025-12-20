@@ -11,9 +11,10 @@ public record AuthResponse(
     String role,
     LocalDateTime createdAt,
     String token,
-    String tokenType) {
+    String tokenType,
+    Long expiresAt) {
   public AuthResponse(UUID id, String email, String firstName, String lastName,
-      String role, LocalDateTime createdAt, String token) {
-    this(id, email, firstName, lastName, role, createdAt, token, "Bearer");
+      String role, LocalDateTime createdAt, String token, Long expiresAt) {
+    this(id, email, firstName, lastName, role, createdAt, token, "Bearer", expiresAt);
   }
 }
