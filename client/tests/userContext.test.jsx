@@ -16,16 +16,31 @@ function TestConsumer() {
       <div data-testid="user">{user ? JSON.stringify(user) : 'null'}</div>
       <div data-testid="headers">{JSON.stringify(authHeaders())}</div>
 
+      {/* ✅ login с expiresAt */}
       <button
-        onClick={() => login({ token: 'abc', tokenType: 'Bearer', email: 'x@test.com' })}
+        onClick={() =>
+          login({
+            token: 'abc',
+            tokenType: 'Bearer',
+            email: 'x@test.com',
+            expiresAt: Date.now() + 60 * 60 * 1000, // +1h
+          })
+        }
       >
         login
       </button>
 
       <button onClick={() => logout()}>logout</button>
 
+      {/* ✅ setUser също с expiresAt */}
       <button
-        onClick={() => login({ token: 't123', tokenType: 'Bearer' })}
+        onClick={() =>
+          login({
+            token: 't123',
+            tokenType: 'Bearer',
+            expiresAt: Date.now() + 60 * 60 * 1000, // +1h
+          })
+        }
       >
         setUser
       </button>
