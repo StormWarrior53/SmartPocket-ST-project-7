@@ -69,6 +69,12 @@ public class ChildController {
         return ResponseEntity.ok(children);
     }
 
+    @GetMapping("/leaderboard")
+    public ResponseEntity<List<ChildListResponse>> getLeaderboard() {
+        List<ChildListResponse> leaderboard = childService.getLeaderboard();
+        return ResponseEntity.ok(leaderboard);
+    }
+
 //    ------------
 
     @PatchMapping("/me/allowance")
