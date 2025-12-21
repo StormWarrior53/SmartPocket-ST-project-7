@@ -38,6 +38,7 @@ public class SecurityConfig {
             .permitAll()
             .requestMatchers("/api/children/leaderboard").permitAll()
             .requestMatchers("/api/store/**", "/api/exercises/**").permitAll()
+            .requestMatchers("/api/test/**").permitAll() // TEST ONLY - REMOVE IN PRODUCTION
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
             .requestMatchers("/api/parents/me/**").authenticated()
             .requestMatchers("/api/children/me").authenticated()

@@ -104,4 +104,46 @@ export const childApi = {
         }),
 };
 
+export const quizApi = {
+    getQuizByExerciseId: (exerciseId) =>
+        apiRequest(`/exercises/${exerciseId}/quiz`, {
+            method: 'GET',
+        }),
+    submitQuiz: (quizId, answers) =>
+        apiRequest(`/quizzes/${quizId}/submit`, {
+            method: 'POST',
+            body: JSON.stringify({ answers }),
+        }),
+    getAllQuizzes: () =>
+        apiRequest('/quizzes', {
+            method: 'GET',
+        }),
+    getQuizById: (quizId) =>
+        apiRequest(`/quizzes/${quizId}`, {
+            method: 'GET',
+        }),
+    createQuiz: (quizData) =>
+        apiRequest('/quizzes', {
+            method: 'POST',
+            body: JSON.stringify(quizData),
+        }),
+    updateQuiz: (quizId, quizData) =>
+        apiRequest(`/quizzes/${quizId}`, {
+            method: 'PUT',
+            body: JSON.stringify(quizData),
+        }),
+    deleteQuiz: (quizId, force = false) =>
+        apiRequest(`/quizzes/${quizId}?force=${force}`, {
+            method: 'DELETE',
+        }),
+    getQuizAttempts: (quizId) =>
+        apiRequest(`/quizzes/${quizId}/attempts`, {
+            method: 'GET',
+        }),
+    getMyQuizAttempts: () =>
+        apiRequest('/children/me/quiz-attempts', {
+            method: 'GET',
+        }),
+};
+
 export { ApiError };

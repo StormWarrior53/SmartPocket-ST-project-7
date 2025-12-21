@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.server.service.TokenBlacklistService;
 import org.example.server.util.JwtUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -46,13 +49,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     // Don't authenticate - token is revoked
                 } else {
                     String email = jwtUtil.extractEmail(jwt);
+                    String role = jwtUtil.extractRole(jwt);
+
+                    List<SimpleGrantedAuthority> authorities = role != null
+                        ? Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
+                        : new ArrayList<>();
 
                     UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userId, null, new ArrayList<>());
+                        new UsernamePasswordAuthenticationToken(userId, null, authorities);
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    log.debug("JWT authentication successful for user {} (id={}) at {}", email, userId, requestURI);
+                    log.debug("JWT authentication successful for user {} (id={}, role={}) at {}", email, userId, role, requestURI);
                 }
             } else if (jwt != null) {
                 log.warn("Invalid JWT token received for request to {}", requestURI);

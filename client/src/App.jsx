@@ -14,6 +14,8 @@ import Profile from "./components/profile/Profile.jsx"
 import RoadmapDetails from "./components/roadmap-details/RoadmapDetails.jsx"
 import Games from "./components/games-page/Games.jsx"
 import Quiz from "./components/quiz-page/Quiz.jsx"
+import QuizAdmin from "./components/admin/QuizAdmin.jsx"
+import QuizHistory from "./components/quiz-history/QuizHistory.jsx"
 import CreateChild from "./components/create-child/CreateChild.jsx"
 import BudgetGame from "./components/budget-game/BudgetGame.jsx"
 import { useTokenExpiration } from './hooks/useTokenExpiration'
@@ -45,6 +47,8 @@ function App() {
                 <Route path="/games" element={<Games />} />
                 <Route path="budget-game" element={<BudgetGame />} />
                 <Route path="/quiz/:id" element={<Quiz />} />
+                <Route path="/admin/quiz" element={<QuizAdmin />} />
+                <Route path="/quiz-history" element={<QuizHistory />} />
 
                 <Route path="/create-child" element={<CreateChild />} />
 

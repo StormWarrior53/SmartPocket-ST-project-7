@@ -69,6 +69,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
   }
 
   private boolean isAuthEndpoint(String path) {
+    // Exclude test endpoints from rate limiting
+    if (path.startsWith("/api/test/")) {
+      return false;
+    }
+
     return path.startsWith("/api/parents/login") ||
         path.startsWith("/api/parents/register") ||
         path.startsWith("/api/children/login") ||
