@@ -67,8 +67,7 @@ describe("Leaderboard", () => {
   it("shows loading first, then renders table with users", async () => {
     renderLeaderboard();
 
-    // initial loading (може да се появи много кратко, затова го търсим “по-леко”)
-    // Ако не го хване винаги, не е проблем — основното е след това да има таблица.
+  
     await waitFor(() => {
       expect(screen.getByText(/Top 100 XP Leaders/i)).toBeInTheDocument();
     });
@@ -96,7 +95,7 @@ describe("Leaderboard", () => {
 
     await screen.findByText(/Top 100 XP Leaders/i);
 
-    // намираме таблицата и гледаме първия ред в tbody
+   
     const table = screen.getByRole("table");
     const tbody = table.querySelector("tbody");
     expect(tbody).toBeTruthy();
@@ -104,7 +103,7 @@ describe("Leaderboard", () => {
     const rows = within(tbody).getAllByRole("row");
     expect(rows.length).toBeGreaterThan(0);
 
-    // row[0] трябва да е Mimi (xp 120)
+
     expect(within(rows[0]).getByText("Mimi")).toBeInTheDocument();
     expect(within(rows[0]).getByText("120")).toBeInTheDocument();
   });
@@ -152,8 +151,7 @@ describe("Leaderboard", () => {
     const mimiCell = screen.getByText("Mimi");
     const row = mimiCell.closest("tr");
     expect(row).toBeTruthy();
-
-    // проверяваме за част от класовете, които се слагат при isMe
+    
     expect(row.className).toMatch(/bg-blue-100\/70/);
     expect(row.className).toMatch(/ring-1/);
   });

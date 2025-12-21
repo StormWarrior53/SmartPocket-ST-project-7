@@ -6,7 +6,7 @@ import { render, screen, waitFor, fireEvent, within } from "@testing-library/rea
 import BudgetGame from "../src/components/budget-game/BudgetGame.jsx";
 import { UserProvider } from "../src/context/UserContext.jsx";
 
-// BudgetGame uses useNavigate from "react-router"
+
 const navigateMock = vi.fn();
 
 vi.mock("react-router", async () => {
@@ -38,7 +38,7 @@ function renderBudgetGame() {
   );
 }
 
-// ✅ TEMP: skip BudgetGame tests for now
+
 describe.skip("BudgetGame", () => {
   let fetchMock;
 
@@ -46,7 +46,7 @@ describe.skip("BudgetGame", () => {
     localStorage.clear();
     navigateMock.mockClear();
 
-    // Make user "logged in" so isAuthenticated becomes true in UserContext
+    
     localStorage.setItem(
       "user",
       JSON.stringify({
@@ -56,7 +56,7 @@ describe.skip("BudgetGame", () => {
       })
     );
 
-    // Stable random -> "Quiet month" branch
+    
     vi.spyOn(Math, "random").mockReturnValue(0.9);
 
     // Default fetch mock (we override per test with allowanceMoney)

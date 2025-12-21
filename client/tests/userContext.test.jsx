@@ -16,7 +16,7 @@ function TestConsumer() {
       <div data-testid="user">{user ? JSON.stringify(user) : 'null'}</div>
       <div data-testid="headers">{JSON.stringify(authHeaders())}</div>
 
-      {/* ✅ login с expiresAt */}
+      {/* login с expiresAt */}
       <button
         onClick={() =>
           login({
@@ -32,7 +32,7 @@ function TestConsumer() {
 
       <button onClick={() => logout()}>logout</button>
 
-      {/* ✅ setUser също с expiresAt */}
+      {/* setUser също с expiresAt */}
       <button
         onClick={() =>
           login({
@@ -114,7 +114,7 @@ describe('UserContext', () => {
     renderWithProvider();
 
     await waitFor(() => {
-      // След mount -> loading става false
+      
       expect(screen.getByTestId('loading').textContent).toBe('false');
     });
 

@@ -1,12 +1,7 @@
 // tests/apiService.test.js
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
-/**
- * IMPORTANT:
- * 1) Ако твоят файл е на друго място, смени този import път.
- *    Най-често е: ../src/services/api.js
- * 2) Ако нямате export на handleResponse/request, виж "Ако import-ът гръмне" под кода.
- */
+
 import * as api from "../src/services/api.js";
 
 function makeResponse({
@@ -40,7 +35,7 @@ describe("services/api.js", () => {
 
   describe("handleResponse (edge cases)", () => {
     it("returns JSON when ok + application/json", async () => {
-      if (!api.handleResponse) return; // ако не е export-нато, тестът се пропуска
+      if (!api.handleResponse) return; 
 
       const res = makeResponse({
         ok: true,
@@ -103,7 +98,7 @@ describe("services/api.js", () => {
         textData: "<html>500 error</html>",
       });
 
-      // Може да е общо "Request failed" / "HTTP 500" / друго — проверяваме че хвърля
+      
       await expect(api.handleResponse(res)).rejects.toBeTruthy();
     });
 
@@ -118,7 +113,7 @@ describe("services/api.js", () => {
       });
 
       const data = await api.handleResponse(res);
-      // някои имплементации връщат null/""/undefined — приемаме null-ish или празен стринг
+      
       expect(data === null || data === "" || typeof data === "undefined").toBe(true);
     });
   });
