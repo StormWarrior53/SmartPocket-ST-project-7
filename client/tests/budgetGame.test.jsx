@@ -1,5 +1,4 @@
-// tests/budgetGame.test.jsx
-import React from "react";
+
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, waitFor, fireEvent, within } from "@testing-library/react";
 
