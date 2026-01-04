@@ -1,7 +1,5 @@
 # SmartPocket - Financial Literacy Platform for Children
 
-SmartPocket е интерактивна финансова платформа, предназначена за деца от 7 до 18 годишна възраст, която цели да развие финансова грамотност чрез геймификация, курсове и финансови симулации.
-
 ## Table of Contents
 
 - [Overview](#overview)
@@ -1214,53 +1212,6 @@ npm run build
 # Deploy dist folder to static hosting (Vercel, Netlify, etc.)
 # Configure VITE_API_URL to production backend URL
 ```
-
-### Docker Deployment (Example)
-
-**Backend Dockerfile:**
-
-```dockerfile
-FROM eclipse-temurin:17-jdk-alpine
-WORKDIR /app
-COPY target/server-0.0.1-SNAPSHOT.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
-```
-
-**Frontend Dockerfile:**
-
-```dockerfile
-FROM node:18-alpine AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
-FROM node:18-alpine
-WORKDIR /app
-COPY --from=build /app/dist ./dist
-RUN npm install -g serve
-EXPOSE 3000
-CMD ["serve", "-s", "dist", "-l", "3000"]
-```
-
-### Production Checklist
-
-- [ ] Change JWT_SECRET to strong random value (256+ bits)
-- [ ] Configure production database (managed PostgreSQL)
-- [ ] Set CORS_ALLOWED_ORIGINS to frontend domain
-- [ ] Enable HTTPS (TLS/SSL certificates)
-- [ ] Configure proper logging (centralized log aggregation)
-- [ ] Set up database backups
-- [ ] Configure rate limiting for production load
-- [ ] Review and harden security settings
-- [ ] Set up monitoring and alerting
-- [ ] Configure CDN for frontend assets
-- [ ] Enable database connection pooling
-- [ ] Review and optimize SQL queries
-- [ ] Set up CI/CD pipeline
-- [ ] Configure error tracking (Sentry, etc.)
 
 ## License
 
