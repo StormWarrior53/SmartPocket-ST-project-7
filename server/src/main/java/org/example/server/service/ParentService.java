@@ -80,7 +80,8 @@ public class ParentService {
 
     log.info("Login successful. ParentId={}", parent.getId());
 
-    String token = jwtUtil.generateToken(parent.getId(), parent.getEmail(), "parent");
+    String role = parent.isAdmin() ? "admin" : "parent";
+    String token = jwtUtil.generateToken(parent.getId(), parent.getEmail(), role);
     Date expirationDate = jwtUtil.getExpirationDate(token);
     Long expiresAt = expirationDate.getTime();
 
@@ -89,7 +90,7 @@ public class ParentService {
         parent.getEmail(),
         parent.getFirstName(),
         parent.getLastName(),
-        "parent",
+        role,
         parent.getCreatedAt(),
         token,
         expiresAt);

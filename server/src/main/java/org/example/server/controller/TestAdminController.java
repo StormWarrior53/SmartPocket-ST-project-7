@@ -41,6 +41,7 @@ public class TestAdminController {
                 .firstName(request.firstName())
                 .lastName(request.lastName())
                 .passwordHash(passwordEncoder.encode(request.password()))
+                .isAdmin(true)
                 .build();
 
         Parent savedAdmin = parentRepository.save(admin);

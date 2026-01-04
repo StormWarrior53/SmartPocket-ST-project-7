@@ -52,9 +52,25 @@ async function handleResponse(response) {
 }
 
 async function apiRequest(endpoint, options = {}) {
+    // Get auth token from localStorage
+    const authHeaders = {};
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+        try {
+            const user = JSON.parse(storedUser);
+            if (user?.token) {
+                const tokenType = user.tokenType || 'Bearer';
+                authHeaders.Authorization = `${tokenType} ${user.token}`;
+            }
+        } catch (e) {
+            console.error('Failed to parse stored user:', e);
+        }
+    }
+
     const config = {
         headers: {
             'Content-Type': 'application/json',
+            ...authHeaders,
             ...options.headers,
         },
         ...options,
