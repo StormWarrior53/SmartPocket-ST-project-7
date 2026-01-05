@@ -1,12 +1,45 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router";
-import { getQuizByLectureId } from "../../data/quizzes.js";
+import { quizApi } from "../../services/api.js";
 
 export default function Quiz() {
     const { id } = useParams();
-    const quiz = useMemo(() => getQuizByLectureId(id), [id]);
+    const [quiz, setQuiz] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [answers, setAnswers] = useState({});
     const [result, setResult] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
+
+    useEffect(() => {
+        async function fetchQuiz() {
+            try {
+                setLoading(true);
+                const data = await quizApi.getQuizByExerciseId(id);
+                setQuiz(data);
+                setError(null);
+            } catch (err) {
+                setError(err.message || "Failed to load quiz");
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchQuiz();
+    }, [id]);
+
+    if (loading) {
+        return <div className="p-6 max-w-3xl mx-auto">Loading quiz...</div>;
+    }
+
+    if (error) {
+        return (
+            <div className="p-6 max-w-3xl mx-auto">
+                <h2 className="text-2xl font-bold mb-4">Error</h2>
+                <p className="mb-4 text-red-500">{error}</p>
+                <Link to={`/roadmap/${id}`} className="px-4 py-2 bg-gray-200 rounded">Back</Link>
+            </div>
+        );
+    }
 
     if (!quiz) {
         return (
@@ -22,25 +55,17 @@ export default function Quiz() {
         setAnswers(prev => ({ ...prev, [qId]: choiceId }));
     }
 
-    function submitQuiz() {
-        const total = quiz.questions.length;
-        let correct = 0;
-        quiz.questions.forEach(q => {
-            if (answers[q.id] && answers[q.id] === q.correctChoiceId) correct++;
-        });
-
-        const percent = total === 0 ? 0 : Math.round((correct / total) * 100);
-        const passed = percent >= (quiz.passPercent ?? 70);
-        const awarded = passed ? (correct * (quiz.pocketMoneyPerQuestion ?? 5)) : 0;
-
-        setResult({
-            total,
-            correct,
-            percent,
-            passed,
-            awarded,
-            message: passed ? "Congrats! You passed the quiz." : "You did not pass. Try again."
-        });
+    async function submitQuiz() {
+        try {
+            setSubmitting(true);
+            const result = await quizApi.submitQuiz(quiz.id, answers);
+            setResult(result);
+            setError(null);
+        } catch (err) {
+            setError(err.message || "Failed to submit quiz");
+        } finally {
+            setSubmitting(false);
+        }
     }
 
     return (
@@ -71,9 +96,10 @@ export default function Quiz() {
             <div className="mt-6 flex gap-3">
                 <button
                     onClick={submitQuiz}
-                    className="px-4 py-2 bg-green-600 text-white rounded"
+                    disabled={submitting}
+                    className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Submit Quiz
+                    {submitting ? "Submitting..." : "Submit Quiz"}
                 </button>
 
                 <Link to={`/roadmap/${id}`} className="px-4 py-2 bg-gray-200 rounded">Back</Link>

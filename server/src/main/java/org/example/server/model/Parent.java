@@ -37,6 +37,10 @@ public class Parent {
     @Column(nullable = false)
     private String passwordHash;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean isAdmin = false;
+
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Child> children = new ArrayList<>();

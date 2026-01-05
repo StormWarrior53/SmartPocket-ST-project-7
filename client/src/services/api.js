@@ -52,9 +52,25 @@ async function handleResponse(response) {
 }
 
 async function apiRequest(endpoint, options = {}) {
+    // Get auth token from localStorage
+    const authHeaders = {};
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+        try {
+            const user = JSON.parse(storedUser);
+            if (user?.token) {
+                const tokenType = user.tokenType || 'Bearer';
+                authHeaders.Authorization = `${tokenType} ${user.token}`;
+            }
+        } catch (e) {
+            console.error('Failed to parse stored user:', e);
+        }
+    }
+
     const config = {
         headers: {
             'Content-Type': 'application/json',
+            ...authHeaders,
             ...options.headers,
         },
         ...options,
@@ -101,6 +117,48 @@ export const childApi = {
         request(`${API_BASE_URL}/children/logout`, {
             method: "POST",
             body: JSON.stringify({}),
+        }),
+};
+
+export const quizApi = {
+    getQuizByExerciseId: (exerciseId) =>
+        apiRequest(`/exercises/${exerciseId}/quiz`, {
+            method: 'GET',
+        }),
+    submitQuiz: (quizId, answers) =>
+        apiRequest(`/quizzes/${quizId}/submit`, {
+            method: 'POST',
+            body: JSON.stringify({ answers }),
+        }),
+    getAllQuizzes: () =>
+        apiRequest('/quizzes', {
+            method: 'GET',
+        }),
+    getQuizById: (quizId) =>
+        apiRequest(`/quizzes/${quizId}`, {
+            method: 'GET',
+        }),
+    createQuiz: (quizData) =>
+        apiRequest('/quizzes', {
+            method: 'POST',
+            body: JSON.stringify(quizData),
+        }),
+    updateQuiz: (quizId, quizData) =>
+        apiRequest(`/quizzes/${quizId}`, {
+            method: 'PUT',
+            body: JSON.stringify(quizData),
+        }),
+    deleteQuiz: (quizId, force = false) =>
+        apiRequest(`/quizzes/${quizId}?force=${force}`, {
+            method: 'DELETE',
+        }),
+    getQuizAttempts: (quizId) =>
+        apiRequest(`/quizzes/${quizId}/attempts`, {
+            method: 'GET',
+        }),
+    getMyQuizAttempts: () =>
+        apiRequest('/children/me/quiz-attempts', {
+            method: 'GET',
         }),
 };
 

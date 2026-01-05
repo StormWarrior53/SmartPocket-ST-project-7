@@ -57,11 +57,6 @@
             <artifactId>java-dotenv</artifactId>
             <version>5.2.2</version>
         </dependency>
-        <dependency>
-            <groupId>com.bucket4j</groupId>
-            <artifactId>bucket4j-core</artifactId>
-            <version>8.7.0</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/com.cloudinary/cloudinary-http45 -->
         <dependency>
             <groupId>com.cloudinary</groupId>
