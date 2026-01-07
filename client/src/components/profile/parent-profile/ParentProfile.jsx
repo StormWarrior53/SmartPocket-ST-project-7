@@ -117,12 +117,18 @@ export default function ParentProfile() {
 
             const updated = await res.json().catch(() => null);
             if (updated && updated.id) {
-                setChildren((prev) => prev.map(c => c.id === updated.id ? updated : c));
+                setChildren((prev) =>
+                    prev.map((c) =>
+                        c.id === updated.id
+                            ? { ...c, ...updated, inventory: updated.inventory ?? c.inventory }
+                            : c
+                    )
+                );
             } else {
                 const listRes = await authFetch(`${API_BASE_URL}/parents/me/children`);
                 if (listRes.ok) {
                     const list = await listRes.json();
-                    setChildren(list);
+                    setChildren(Array.isArray(list) ? list.map(c => ({ ...c, inventory: c.inventory ?? [] })) : []);
                 }
             }
         } catch (e) {
@@ -144,7 +150,13 @@ export default function ParentProfile() {
     };
 
     const handleEditSaved = (updatedChild) => {
-        setChildren(prev => prev.map(c => c.id === updatedChild.id ? updatedChild : c));
+        setChildren(prev =>
+            prev.map(c =>
+                c.id === updatedChild.id
+                    ? { ...c, ...updatedChild, inventory: updatedChild.inventory ?? c.inventory }
+                    : c
+            )
+        );
         closeEditModal();
     };
 
