@@ -174,7 +174,6 @@ export default function BudgetGame() {
 
     useEffect(() => {
         loadBudget();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated]);
 
     const setValue = (key, v) => {
