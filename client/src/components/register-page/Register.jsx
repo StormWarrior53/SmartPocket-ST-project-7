@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { authApi, ApiError } from "../../services/api";
+import { useUser } from "../../context/UserContext.jsx";
+
+
 
 const initialValues = {
     firstName: "",
@@ -44,11 +47,21 @@ function validate(values) {
 }
 
 export default function Register() {
-    const navigate = useNavigate();
     const [data, setData] = useState(initialValues);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [apiError, setApiError] = useState("");
+
+    const { isAuthenticated } = useUser();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/", { replace: true });
+        }
+    }, [isAuthenticated, navigate]);
+
+    if (isAuthenticated) return null;
 
     const changeHandler = (e) => {
         setData((state) => ({
