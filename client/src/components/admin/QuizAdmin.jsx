@@ -20,7 +20,7 @@ export default function QuizAdmin() {
         if (authLoading) return;
 
         const isAdmin = user?.role === "admin"
-            || (Array.isArray(user?.roles) && user.roles.includes("admin"))
+            || (Array.isArray(user?.roles) && user.roles.includes("admin") && isAuthenticated === true)
             || user?.isAdmin === true;
 
         if (!isAdmin) {
