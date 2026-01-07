@@ -38,6 +38,35 @@ export function UserProvider({ children }) {
         localStorage.setItem('user', JSON.stringify(userData));
     };
 
+    // Login with pre-generated token (for OAuth)
+    const loginWithToken = (userData) => {
+        if (!userData.token || !userData.expiresAt) {
+            console.error('OAuth login data missing required fields');
+            return;
+        }
+
+        // Validate token is not expired
+        if (userData.expiresAt <= Date.now()) {
+            console.error('Received expired token from OAuth');
+            return;
+        }
+
+        const userWithToken = {
+            id: userData.id,
+            email: userData.email,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            role: userData.role,
+            token: userData.token,
+            tokenType: 'Bearer',
+            expiresAt: userData.expiresAt,
+        };
+
+        setUser(userWithToken);
+        localStorage.setItem('user', JSON.stringify(userWithToken));
+        console.log('User logged in via OAuth:', { email: userWithToken.email, role: userWithToken.role });
+    };
+
     const logout = (reason = null) => {
         setUser(null);
         localStorage.removeItem('user');
@@ -68,6 +97,7 @@ export function UserProvider({ children }) {
     const value = {
         user,
         login,
+        loginWithToken,
         logout,
         isAuthenticated: !!user,
         isTokenExpired,

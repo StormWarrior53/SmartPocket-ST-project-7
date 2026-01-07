@@ -13,7 +13,10 @@ public class ServerApplication {
 			Dotenv dotenv = Dotenv.configure()
 				.ignoreIfMissing()
 				.load();
-			String[] keys = new String[]{"DB_HOST","DB_PORT","DB_NAME","DB_USERNAME","DB_PASSWORD","SERVER_PORT","CORS_ALLOWED_ORIGINS","DB_URL"};
+			String[] keys = new String[]{
+				"DB_HOST","DB_PORT","DB_NAME","DB_USERNAME","DB_PASSWORD","SERVER_PORT","CORS_ALLOWED_ORIGINS","DB_URL",
+				"GOOGLE_CLIENT_ID","GOOGLE_CLIENT_SECRET","GOOGLE_REDIRECT_URI","FRONTEND_URL"
+			};
 			for (String key : keys) {
 				String val = dotenv.get(key);
 				if (val != null && System.getProperty(key) == null && System.getenv(key) == null) {

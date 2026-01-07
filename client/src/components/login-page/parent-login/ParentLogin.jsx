@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { authApi, ApiError } from "../../../services/api";
 import { useUser } from "../../../context/UserContext";
+import { useGoogleOAuth } from "../../../hooks/useGoogleOAuth";
 
 
 
@@ -20,6 +21,7 @@ function validate(values) {
 export default function ParentLogin() {
     const navigate = useNavigate();
     const { login } = useUser();
+    const { initiateGoogleLogin, isLoading: googleLoading } = useGoogleOAuth();
     const [data, setData] = useState(initialValues);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
@@ -111,6 +113,30 @@ export default function ParentLogin() {
                 className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {loading ? "Logging in..." : "Login"}
+            </button>
+
+            {/* Divider */}
+            <div className="flex items-center my-4">
+                <div className="flex-1 border-t border-gray-300"></div>
+                <span className="px-3 text-gray-500 text-sm">OR</span>
+                <div className="flex-1 border-t border-gray-300"></div>
+            </div>
+
+            {/* Google Sign-In Button */}
+            <button
+                type="button"
+                onClick={initiateGoogleLogin}
+                disabled={googleLoading || loading}
+                className="w-full flex items-center justify-center gap-3 bg-white text-gray-700 py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 hover:shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                <img
+                    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                    alt="Google logo"
+                    className="w-5 h-5"
+                />
+                <span className="font-medium">
+                    {googleLoading ? 'Redirecting to Google...' : 'Sign in with Google'}
+                </span>
             </button>
 
             <p className="text-center text-sm text-gray-600 mt-2">

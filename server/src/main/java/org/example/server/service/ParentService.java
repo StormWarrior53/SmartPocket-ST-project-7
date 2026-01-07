@@ -73,6 +73,12 @@ public class ParentService {
           return new InvalidCredentialsException("Invalid email or password");
         });
 
+    if (parent.isOAuthAccount()) {
+      log.warn("Login failed – OAuth account cannot use password login: {}", request.email());
+      throw new InvalidCredentialsException(
+          "This account uses Google Sign-In. Please use the 'Sign in with Google' button.");
+    }
+
     if (!passwordEncoder.matches(request.password(), parent.getPasswordHash())) {
       log.warn("Login failed – wrong password. Email={}", request.email());
       throw new InvalidCredentialsException("Invalid email or password");
