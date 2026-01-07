@@ -1,9 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ParentLogin from "./parent-login/ParentLogin.jsx";
 import ChildLogin from "./child-login/ChildLogin.jsx";
+import { useUser } from "../../context/UserContext.jsx";
+import { useNavigate } from "react-router";
 
 export default function Login() {
     const [mode, setMode] = useState("parent"); // 'parent' | 'child'
+
+    const { isAuthenticated } = useUser();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/", { replace: true });
+        }
+    }, [isAuthenticated, navigate]);
+
+    if (isAuthenticated) return null;
 
     return (
         <section className="flex flex-col md:flex-row items-center justify-center min-h-screen gap-10 p-6">
