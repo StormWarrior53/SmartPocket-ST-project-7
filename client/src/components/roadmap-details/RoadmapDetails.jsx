@@ -9,6 +9,11 @@ export default function RoadmapDetails() {
     const [error, setError] = useState(null);
     const { user, isAuthenticated } = useUser();
 
+    const canTakeQuiz = isAuthenticated && (
+        user?.role === 'child' ||
+        (Array.isArray(user?.roles) && user.roles.includes('child'))
+    );
+
     useEffect(() => {
         setLoading(true);
         fetch(`http://localhost:8080/api/exercises/${lectureId}`)
@@ -31,14 +36,16 @@ export default function RoadmapDetails() {
             <p className="text-gray-600 mb-2">Difficulty: {lecture.difficultyLevel}</p>
             <p className="text-gray-800 mb-4">{lecture.description}</p>
 
-            {user && isAuthenticated && <button>
+            {canTakeQuiz ? (
                 <Link
                     to={`/quiz/${lecture.id}`}
                     className="px-4 py-2 bg-blue-600 text-white rounded mr-4"
                 >
                     Take Quiz
                 </Link>
-            </button>}
+            ) : (
+                <p className="text-sm text-gray-500 mb-5">Only children can take the quiz.</p>
+            )}
 
             <Link to={`/roadmap`} className="px-4 py-2 bg-gray-200 rounded">Back</Link>
 

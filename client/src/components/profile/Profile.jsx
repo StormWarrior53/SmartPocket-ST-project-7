@@ -8,5 +8,11 @@ export default function Profile() {
     if (loading) return <p>Loading...</p>;
     if (!isAuthenticated) return <p>You must be logged in to view your profile.</p>;
 
-    return user?.role === "parent" ? <ParentProfile /> : <ChildProfile />;
+    const isParent = user?.role === "parent"
+        || user?.role === "admin"
+        || (Array.isArray(user?.roles) && (user.roles.includes("parent") || user.roles.includes("admin")))
+        || user?.isParent === true
+        || user?.isAdmin === true;
+
+    return isParent ? <ParentProfile /> : <ChildProfile />;
 }
