@@ -39,6 +39,12 @@ public class ChildController {
 
     @GetMapping("/me")
     public ResponseEntity<ChildResponse> getMyProfile() {
+        // Check if the authenticated user is a child
+        if (!authenticationUtil.isChild()) {
+            throw new org.example.server.exception.AccessDeniedException(
+                "Only children can access this resource. Parents cannot play games.");
+        }
+
         UUID childId = authenticationUtil.getCurrentUserId();
         ChildResponse response = childService.getChildProfile(childId);
         return ResponseEntity.ok(response);
@@ -46,6 +52,12 @@ public class ChildController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(jakarta.servlet.http.HttpServletRequest request) {
+        // Check if the authenticated user is a child
+        if (!authenticationUtil.isChild()) {
+            throw new org.example.server.exception.AccessDeniedException(
+                "Only children can access this resource.");
+        }
+
         UUID childId = authenticationUtil.getCurrentUserId();
         String authHeader = request.getHeader("Authorization");
 
@@ -80,6 +92,11 @@ public class ChildController {
     @PatchMapping("/me/allowance")
     public ResponseEntity<ChildResponse> patchMyAllowance(
             @Valid @RequestBody PatchMoneyRequestDTO request) {
+        // Check if the authenticated user is a child
+        if (!authenticationUtil.isChild()) {
+            throw new org.example.server.exception.AccessDeniedException(
+                "Only children can access this resource.");
+        }
 
         UUID childId = authenticationUtil.getCurrentUserId();
         ChildResponse response = childService.patchAllowanceMoneyMe(childId, request.amount());
@@ -89,6 +106,11 @@ public class ChildController {
     @PatchMapping("/me/pocket")
     public ResponseEntity<ChildResponse> patchMyPocket(
             @Valid @RequestBody PatchMoneyRequestDTO request) {
+        // Check if the authenticated user is a child
+        if (!authenticationUtil.isChild()) {
+            throw new org.example.server.exception.AccessDeniedException(
+                "Only children can access this resource.");
+        }
 
         UUID childId = authenticationUtil.getCurrentUserId();
         ChildResponse response = childService.patchPocketMoneyMe(childId, request.amount());
@@ -98,6 +120,11 @@ public class ChildController {
     @PatchMapping("/me/xp")
     public ResponseEntity<ChildResponse> patchMyXp(
             @Valid @RequestBody PatchXpRequestDTO request) {
+        // Check if the authenticated user is a child
+        if (!authenticationUtil.isChild()) {
+            throw new org.example.server.exception.AccessDeniedException(
+                "Only children can access this resource.");
+        }
 
         UUID childId = authenticationUtil.getCurrentUserId();
         ChildResponse response = childService.patchXpMe(childId, request.xp());

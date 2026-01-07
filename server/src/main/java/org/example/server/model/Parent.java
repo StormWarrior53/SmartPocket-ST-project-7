@@ -19,43 +19,60 @@ import java.util.UUID;
 @Entity
 public class Parent {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
-    @Column(unique = true, nullable = false)
-    @Email
-    @NotBlank
-    private String email;
+  @Column(unique = true, nullable = false)
+  @Email
+  @NotBlank
+  private String email;
 
-    @Column(nullable = false)
-    private String firstName;
+  @Column(nullable = false)
+  private String firstName;
 
-    @Column(nullable = false)
-    private String lastName;
+  @Column(nullable = false)
+  private String lastName;
 
-    @Column(nullable = false)
-    private String passwordHash;
+  @Column(nullable = true) // Nullable for OAuth users who don't have a password
+  private String passwordHash;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private boolean isAdmin = false;
+  @Column(name = "google_id", unique = true)
+  private String googleId; // Google's unique user ID (sub claim from OAuth)
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Child> children = new ArrayList<>();
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  @Builder.Default
+  private AuthProvider authProvider = AuthProvider.LOCAL; // Authentication provider (LOCAL or GOOGLE)
 
-    @CreationTimestamp
-    @Column(updatable = false, nullable = false)
-    private LocalDateTime createdAt;
+  @Column(nullable = false)
+  @Builder.Default
+  private boolean isAdmin = false;
 
-    public void addChild(Child child) {
-        children.add(child);
-        child.setParent(this);
-    }
+  @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  private List<Child> children = new ArrayList<>();
 
-    public void removeChild(Child child) {
-        children.remove(child);
-        child.setParent(null);
-    }
+  @CreationTimestamp
+  @Column(updatable = false, nullable = false)
+  private LocalDateTime createdAt;
+
+  public void addChild(Child child) {
+    children.add(child);
+    child.setParent(this);
+  }
+
+  public void removeChild(Child child) {
+    children.remove(child);
+    child.setParent(null);
+  }
+
+  /**
+   * Helper method to check if this parent account uses OAuth authentication.
+   * 
+   * @return true if this is an OAuth account, false for local email/password
+   */
+  public boolean isOAuthAccount() {
+    return authProvider == AuthProvider.GOOGLE;
+  }
 }

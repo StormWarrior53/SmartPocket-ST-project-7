@@ -7,6 +7,7 @@ import Leaderboard from "./components/leaderboard-page/Leaderboard.jsx"
 import Home from "./components/home-page/Home.jsx"
 import Register from "./components/register-page/Register.jsx"
 import Login from "./components/login-page/Login.jsx"
+import { GoogleCallbackPage } from "./components/GoogleCallbackPage.jsx"
 import NotFound from "./components/not-found-page/NotFound.jsx"
 import Store from "./components/store/Store.jsx"
 import Roadmap from "./components/roadmap-page/Roadmap.jsx"
@@ -40,6 +41,7 @@ function App() {
                 <Route path="/leaderboard" element={<Leaderboard />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
                 <Route path="/store" element={<Store />} />
                 <Route path="/roadmap" element={<Roadmap />} />
                 <Route path="/roadmap/:lectureId" element={<RoadmapDetails />} />
