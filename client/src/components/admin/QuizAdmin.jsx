@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { quizApi } from "../../services/api.js";
+import { useUser } from "../../context/UserContext.jsx";
+import { useNavigate } from "react-router";
 
 export default function QuizAdmin() {
     const [quizzes, setQuizzes] = useState([]);
@@ -10,6 +12,21 @@ export default function QuizAdmin() {
     const [editingQuizId, setEditingQuizId] = useState(null);
     const [viewingAttemptsQuizId, setViewingAttemptsQuizId] = useState(null);
     const [attempts, setAttempts] = useState([]);
+
+    const { user, isAuthenticated, loading: authLoading } = useUser();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (authLoading) return;
+
+        const isAdmin = user?.role === "admin"
+            || (Array.isArray(user?.roles) && user.roles.includes("admin") && isAuthenticated === true)
+            || user?.isAdmin === true;
+
+        if (!isAdmin) {
+            navigate("/", { replace: true });
+        }
+    }, [user, authLoading, navigate]);
 
     const [formData, setFormData] = useState({
         title: "",
