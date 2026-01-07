@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { useUser } from '../context/UserContext';
+import { useUser } from '../../context/UserContext';
 
 /**
  * Handles OAuth callback from Google.
@@ -53,7 +53,6 @@ export function GoogleCallbackPage() {
         expiresAt: parseInt(expiresAt),
       };
 
-      console.log('Google OAuth successful, logging in user:', { email, role });
       loginWithToken(userData);
       navigate('/'); // Redirect to home page
     };

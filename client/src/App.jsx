@@ -7,7 +7,6 @@ import Leaderboard from "./components/leaderboard-page/Leaderboard.jsx"
 import Home from "./components/home-page/Home.jsx"
 import Register from "./components/register-page/Register.jsx"
 import Login from "./components/login-page/Login.jsx"
-import { GoogleCallbackPage } from "./components/GoogleCallbackPage.jsx"
 import NotFound from "./components/not-found-page/NotFound.jsx"
 import Store from "./components/store/Store.jsx"
 import Roadmap from "./components/roadmap-page/Roadmap.jsx"
@@ -21,6 +20,7 @@ import CreateChild from "./components/create-child/CreateChild.jsx"
 import BudgetGame from "./components/budget-game/BudgetGame.jsx"
 import { useTokenExpiration } from './hooks/useTokenExpiration'
 import { setApiLogoutCallback } from './services/api'
+import { GoogleCallbackPage } from "./components/google-callback-page/GoogleCallbackPage.jsx"
 
 function App() {
     const { handleExpiredToken } = useTokenExpiration(5); // 5-minute warning
