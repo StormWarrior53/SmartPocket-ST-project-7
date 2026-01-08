@@ -254,4 +254,58 @@ class QuizServiceTest {
     verify(quizRepository).deleteById(quizId);
     verify(quizAttemptRepository, never()).deleteAll(any());
   }
+
+  @Test
+  void submitQuiz_RetakeAfterPassing_NoMoneyAwarded() {
+    UUID questionId = testQuiz.getQuestions().get(0).getId();
+    Map<UUID, String> answers = Map.of(questionId, "a"); // Correct answer
+
+    // Create a previous passing attempt
+    QuizAttempt previousAttempt = new QuizAttempt(testQuiz, testChild, 1, 1, 100, true, 10);
+    List<QuizAttempt> previousAttempts = Arrays.asList(previousAttempt);
+
+    QuizSubmitRequestDTO request = new QuizSubmitRequestDTO(answers);
+
+    when(quizRepository.findById(quizId)).thenReturn(Optional.of(testQuiz));
+    when(childRepository.findById(childId)).thenReturn(Optional.of(testChild));
+    when(quizAttemptRepository.findByChildIdAndQuizId(childId, quizId)).thenReturn(previousAttempts);
+    when(quizAttemptRepository.save(any(QuizAttempt.class))).thenAnswer(i -> i.getArguments()[0]);
+
+    QuizSubmitResponseDTO result = quizService.submitQuiz(quizId, childId, request);
+
+    assertNotNull(result);
+    assertTrue(result.passed());
+    assertEquals(100, result.percent());
+    assertEquals(0, result.awarded()); // No money awarded on retake
+    assertTrue(result.message().contains("already awarded"));
+    verify(childRepository, never()).save(any(Child.class)); // No money transaction
+    verify(quizAttemptRepository).save(any(QuizAttempt.class)); // But attempt is still recorded
+  }
+
+  @Test
+  void submitQuiz_RetakeAfterFailing_MoneyAwardedIfPassed() {
+    UUID questionId = testQuiz.getQuestions().get(0).getId();
+    Map<UUID, String> answers = Map.of(questionId, "a"); // Correct answer
+
+    // Create a previous failing attempt
+    QuizAttempt previousAttempt = new QuizAttempt(testQuiz, testChild, 1, 0, 0, false, 0);
+    List<QuizAttempt> previousAttempts = Arrays.asList(previousAttempt);
+
+    QuizSubmitRequestDTO request = new QuizSubmitRequestDTO(answers);
+
+    when(quizRepository.findById(quizId)).thenReturn(Optional.of(testQuiz));
+    when(childRepository.findById(childId)).thenReturn(Optional.of(testChild));
+    when(quizAttemptRepository.findByChildIdAndQuizId(childId, quizId)).thenReturn(previousAttempts);
+    when(childRepository.save(any(Child.class))).thenReturn(testChild);
+    when(quizAttemptRepository.save(any(QuizAttempt.class))).thenAnswer(i -> i.getArguments()[0]);
+
+    QuizSubmitResponseDTO result = quizService.submitQuiz(quizId, childId, request);
+
+    assertNotNull(result);
+    assertTrue(result.passed());
+    assertEquals(100, result.percent());
+    assertEquals(10, result.awarded()); // Money awarded on first pass
+    verify(childRepository).save(any(Child.class)); // Money transaction occurs
+    verify(quizAttemptRepository).save(any(QuizAttempt.class));
+  }
 }
