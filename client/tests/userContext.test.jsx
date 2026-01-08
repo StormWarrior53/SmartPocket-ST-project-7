@@ -1,5 +1,4 @@
 // tests/userContext.test.jsx
-import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -114,7 +113,7 @@ describe('UserContext', () => {
     renderWithProvider();
 
     await waitFor(() => {
-      
+
       expect(screen.getByTestId('loading').textContent).toBe('false');
     });
 

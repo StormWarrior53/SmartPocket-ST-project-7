@@ -1,8 +1,7 @@
 // tests/leaderboard.test.jsx
-import React from "react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 
 import Leaderboard from "../src/components/leaderboard-page/Leaderboard.jsx";
 

@@ -17,6 +17,12 @@ vi.mock("react-router", async () => {
   };
 });
 
+vi.mock("../src/context/UserContext", () => {
+  return {
+    useUser: () => ({ isAuthenticated: false }),
+  };
+});
+
 vi.mock("../src/services/api", () => {
   class ApiError extends Error {
     constructor(message, errors) {

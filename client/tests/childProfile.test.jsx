@@ -1,5 +1,4 @@
 // tests/childProfile.test.jsx
-import React from "react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 
@@ -93,23 +92,18 @@ describe("ChildProfile", () => {
     // wait until profile name appears
     expect(await screen.findByRole("heading", { name: "TestKid" })).toBeInTheDocument();
 
-    // profile info
     expect(screen.getByText(/Age:\s*10/i)).toBeInTheDocument();
     expect(screen.getByText(/Parent:\s*parent@test\.com/i)).toBeInTheDocument();
 
-    // stat cards
     expect(screen.getByText("XP")).toBeInTheDocument();
     expect(screen.getByText("Pocket Money")).toBeInTheDocument();
     expect(screen.getByText("Allowance Money")).toBeInTheDocument();
 
-    // inventory title
     expect(screen.getByRole("heading", { name: /My Inventory/i })).toBeInTheDocument();
 
-    // inventory items
     expect(await screen.findByText("Pencil")).toBeInTheDocument();
     expect(screen.getByText("Notebook")).toBeInTheDocument();
 
-    // called both endpoints
     await waitFor(() => {
       const calls = mockAuthFetch.mock.calls.map(([u]) => String(u));
       expect(calls.some((u) => u.includes("/children/me"))).toBe(true);

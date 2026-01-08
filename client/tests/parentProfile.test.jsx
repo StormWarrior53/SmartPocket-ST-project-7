@@ -51,12 +51,6 @@ function okJson(data) {
   };
 }
 
-function failJson(data) {
-  return {
-    ok: false,
-    json: vi.fn().mockResolvedValue(data),
-  };
-}
 
 function okNoJson() {
   return { ok: true, json: vi.fn().mockResolvedValue(null) };
