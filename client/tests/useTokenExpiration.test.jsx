@@ -82,10 +82,12 @@ describe('useTokenExpiration', () => {
 
         renderHook(() => useTokenExpiration(), { wrapper });
 
-        await waitFor(() => {
-            expect(logoutMock).toHaveBeenCalledWith('expired');
+        // Flush pending timers and promises
+        await act(async () => {
+            await vi.runAllTimersAsync();
         });
 
+        expect(logoutMock).toHaveBeenCalledWith('expired');
         expect(navigateMock).toHaveBeenCalledWith('/login', {
             state: {
                 message: 'Your session has expired. Please log in again.',
@@ -105,14 +107,12 @@ describe('useTokenExpiration', () => {
         renderHook(() => useTokenExpiration(), { wrapper });
 
         // Fast forward past expiry
-        act(() => {
+        await act(async () => {
             vi.advanceTimersByTime(15000); // Advance 15 seconds
+            await vi.runAllTimersAsync();
         });
 
-        await waitFor(() => {
-            expect(logoutMock).toHaveBeenCalledWith('expired');
-        });
-
+        expect(logoutMock).toHaveBeenCalledWith('expired');
         expect(navigateMock).toHaveBeenCalledWith('/login', {
             state: {
                 message: 'Your session has expired. Please log in again.',
@@ -134,13 +134,12 @@ describe('useTokenExpiration', () => {
         renderHook(() => useTokenExpiration(5), { wrapper }); // Warning at 5 minutes
 
         // Advance to trigger warning check (30 seconds interval)
-        act(() => {
+        await act(async () => {
             vi.advanceTimersByTime(30000);
+            await vi.runAllTimersAsync();
         });
 
-        await waitFor(() => {
-            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Session expires in'));
-        });
+        expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Session expires in'));
 
         consoleWarnSpy.mockRestore();
     });
@@ -158,17 +157,17 @@ describe('useTokenExpiration', () => {
         renderHook(() => useTokenExpiration(5), { wrapper });
 
         // Advance multiple times
-        act(() => {
+        await act(async () => {
             vi.advanceTimersByTime(30000); // First check
+            await vi.runAllTimersAsync();
         });
 
-        act(() => {
+        await act(async () => {
             vi.advanceTimersByTime(30000); // Second check
+            await vi.runAllTimersAsync();
         });
 
-        await waitFor(() => {
-            expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
-        });
+        expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
 
         consoleWarnSpy.mockRestore();
     });
@@ -185,13 +184,12 @@ describe('useTokenExpiration', () => {
 
         renderHook(() => useTokenExpiration(10), { wrapper }); // Warning at 10 minutes
 
-        act(() => {
+        await act(async () => {
             vi.advanceTimersByTime(30000);
+            await vi.runAllTimersAsync();
         });
 
-        await waitFor(() => {
-            expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Session expires in'));
-        });
+        expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Session expires in'));
 
         consoleWarnSpy.mockRestore();
     });
@@ -247,14 +245,12 @@ describe('useTokenExpiration', () => {
 
         const { result } = renderHook(() => useTokenExpiration(), { wrapper });
 
-        act(() => {
+        await act(async () => {
             result.current.handleExpiredToken('server-rejected');
+            await vi.runAllTimersAsync();
         });
 
-        await waitFor(() => {
-            expect(logoutMock).toHaveBeenCalledWith('server-rejected');
-        });
-
+        expect(logoutMock).toHaveBeenCalledWith('server-rejected');
         expect(navigateMock).toHaveBeenCalledWith('/login', {
             state: {
                 message: 'Authentication failed. Please log in again.',

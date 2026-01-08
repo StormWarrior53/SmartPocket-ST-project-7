@@ -38,7 +38,7 @@ function renderBudgetGame() {
 }
 
 
-describe.skip("BudgetGame", () => {
+describe("BudgetGame", () => {
   let fetchMock;
 
   beforeEach(() => {
@@ -180,7 +180,8 @@ describe.skip("BudgetGame", () => {
     renderBudgetGame();
 
     // Make savings low by setting Miscellaneous = 800 (expenses 175 + 800 = 975, savings 25)
-    const miscInput = await screen.findByLabelText(/Miscellaneous/i);
+    const miscInputs = await screen.findAllByLabelText(/Miscellaneous/i);
+    const miscInput = miscInputs.find(input => input.type === 'number');
     fireEvent.change(miscInput, { target: { value: "800" } });
 
     const doneBtn = screen.getByRole("button", { name: /^Done$/i });
