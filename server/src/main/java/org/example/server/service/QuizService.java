@@ -70,6 +70,10 @@ public class QuizService {
                 return new ResourceNotFoundException("Child not found");
             });
 
+        // Check if child has previously passed this quiz
+        List<QuizAttempt> previousAttempts = quizAttemptRepository.findByChildIdAndQuizId(childId, quizId);
+        boolean hasPassedBefore = previousAttempts.stream().anyMatch(QuizAttempt::getPassed);
+
         Map<UUID, String> answers = request.answers();
         int totalQuestions = quiz.getQuestions().size();
         int correctAnswers = 0;
@@ -83,12 +87,16 @@ public class QuizService {
 
         int scorePercent = totalQuestions == 0 ? 0 : Math.round((float) correctAnswers / totalQuestions * 100);
         boolean passed = scorePercent >= quiz.getPassPercent();
-        int pocketMoneyAwarded = passed ? (correctAnswers * quiz.getPocketMoneyPerQuestion()) : 0;
 
-        if (passed && pocketMoneyAwarded > 0) {
+        // Only award pocket money if this is the first time passing
+        int pocketMoneyAwarded = (passed && !hasPassedBefore) ? (correctAnswers * quiz.getPocketMoneyPerQuestion()) : 0;
+
+        if (pocketMoneyAwarded > 0) {
             child.setPocketMoney(child.getPocketMoney() + pocketMoneyAwarded);
             childRepository.save(child);
             log.info("Awarded {} pocket money to child {}", pocketMoneyAwarded, childId);
+        } else if (passed && hasPassedBefore) {
+            log.info("Child {} passed quiz {} again, but no pocket money awarded (already passed before)", childId, quizId);
         }
 
         QuizAttempt attempt = new QuizAttempt(
@@ -105,9 +113,14 @@ public class QuizService {
         log.info("Quiz attempt saved - Score: {}/{} ({}%), Passed: {}, Awarded: {}",
             correctAnswers, totalQuestions, scorePercent, passed, pocketMoneyAwarded);
 
-        String message = passed
-            ? "Congrats! You passed the quiz."
-            : "You did not pass. Try again.";
+        String message;
+        if (passed && hasPassedBefore) {
+            message = "Great job! You passed again, but pocket money was already awarded on your first pass.";
+        } else if (passed) {
+            message = "Congrats! You passed the quiz.";
+        } else {
+            message = "You did not pass. Try again.";
+        }
 
         return new QuizSubmitResponseDTO(
             totalQuestions,
