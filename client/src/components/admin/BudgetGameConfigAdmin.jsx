@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { budgetGameApi } from '../../services/api.js';
 import { useUser } from '../../context/UserContext.jsx';
 import { useNavigate } from 'react-router';
+import TestGameModal from './TestGameModal.jsx';
 import './BudgetGameConfigAdmin.css';
 
 export default function BudgetGameConfigAdmin() {
@@ -12,6 +13,8 @@ export default function BudgetGameConfigAdmin() {
     const [editingConfigId, setEditingConfigId] = useState(null);
     const [formError, setFormError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [testingConfig, setTestingConfig] = useState(null);
+    const [testLoading, setTestLoading] = useState(false);
 
     const { user, isAuthenticated, loading: authLoading } = useUser();
     const navigate = useNavigate();
@@ -171,6 +174,67 @@ export default function BudgetGameConfigAdmin() {
                 ['minSavingsRate'].includes(name) ? parseFloat(value) : parseInt(value, 10)
             )
         }));
+    }
+
+    async function handleTestConfig() {
+        try {
+            setTestLoading(true);
+            setFormError('');
+
+            // Validate form first
+            if (!formData.name || !formData.eventConfig) {
+                setFormError('Please fill in required fields before testing');
+                setTestLoading(false);
+                return;
+            }
+
+            // Parse event config to validate JSON
+            try {
+                JSON.parse(formData.eventConfig);
+            } catch (e) {
+                setFormError('Invalid JSON in event configuration: ' + e.message);
+                setTestLoading(false);
+                return;
+            }
+
+            // Create a temporary config object for testing
+            const tempConfig = {
+                id: 'test-' + Date.now(),
+                name: formData.name,
+                description: formData.description,
+                minSavingsRate: formData.minSavingsRate,
+                mealCost: formData.mealCost,
+                minMeals: formData.minMeals,
+                minElectricity: formData.minElectricity,
+                minWater: formData.minWater,
+                minGas: formData.minGas,
+                minPlayBudget: formData.minPlayBudget,
+                prizePocketMoney: formData.prizePocketMoney,
+                eventConfig: formData.eventConfig,
+                isActive: false,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+
+            // Open the test game modal
+            setTestingConfig(tempConfig);
+
+        } catch (error) {
+            setFormError('Test failed: ' + error.message);
+        } finally {
+            setTestLoading(false);
+        }
+    }
+
+    function getDifficultyDescription(difficulty) {
+        const descriptions = {
+            EXTREME: 'This is extremely difficult. Most players will lose. Consider making it easier.',
+            HARD: 'This is challenging. About 40% of players will succeed.',
+            MEDIUM: 'This is well-balanced. About 60% of players will succeed.',
+            EASY: 'This is fairly easy. About 80% of players will succeed.',
+            TOO_EASY: 'This might be too easy. Almost everyone will win. Consider making it harder.'
+        };
+        return descriptions[difficulty] || 'Unknown difficulty';
     }
 
     if (loading) {
@@ -338,7 +402,19 @@ export default function BudgetGameConfigAdmin() {
                         </div>
 
                         <div className="form-actions">
-                            <button type="submit" className="btn btn-primary">
+                            <button 
+                                type="button" 
+                                onClick={handleTestConfig}
+                                disabled={testLoading}
+                                className="btn btn-primary"
+                            >
+                                {testLoading ? 'Testing...' : 'Test Before Saving'}
+                            </button>
+                            <button 
+                                type="submit" 
+                                disabled={loading || testLoading}
+                                className="btn btn-primary"
+                            >
                                 {editingConfigId ? 'Update' : 'Create'} Configuration
                             </button>
                             <button type="button" onClick={resetForm} className="btn btn-secondary">
@@ -436,6 +512,14 @@ export default function BudgetGameConfigAdmin() {
                             </div>
                         ))}
                     </div>
+                )}
+
+                {/* Test Game Modal */}
+                {testingConfig && (
+                    <TestGameModal 
+                        config={testingConfig} 
+                        onClose={() => setTestingConfig(null)} 
+                    />
                 )}
             </div>
         </div>
