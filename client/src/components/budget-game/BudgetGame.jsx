@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useUser } from '../../context/UserContext';
+import { budgetGameApi } from '../../services/api';
 
 import Modal from './modal/Modal.jsx';
 import Card from './card/Card.jsx';
@@ -11,26 +12,67 @@ import { useNavigate } from 'react-router';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
+// Fallback config with original hardcoded values
+// const FALLBACK_CONFIG = {
+//   minSavingsRate: 0.2,
+//   mealCost: 5,
+//   minMeals: 25,
+//   minElectricity: 20,
+//   minWater: 15,
+//   minGas: 15,
+//   minPlayBudget: 500,
+//   prizePocketMoney: 25,
+//   eventConfig: JSON.stringify({
+//     negative: {
+//       probability: 0.4,
+//       minAmount: 30,
+//       maxAmount: 100,
+//       events: [
+//         { title: "Phone screen broke", message: "Repair costs €{amount}" },
+//         { title: "Unexpected bill", message: "Pay €{amount} for fees" }
+//       ]
+//     },
+//     positive: {
+//       probability: 0.3,
+//       minAmount: 10,
+//       maxAmount: 60,
+//       events: [
+//         { title: "Surprise gift", message: "You received €{amount}!" }
+//       ]
+//     },
+//     neutral: {
+//       probability: 0.3,
+//       events: [
+//         { title: "Quiet month", message: "No surprises this month" }
+//       ]
+//     }
+//   })
+// };
+
 export default function BudgetGame() {
   const { authFetch, isAuthenticated } = useUser();
 
   // UI state
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState('');
+  const [gameConfig, setGameConfig] = useState(null);
+  const [configLoading, setConfigLoading] = useState(true);
+  const [configError, setConfigError] = useState('');
   const [startingBudget, setStartingBudget] = useState(0);
   const [monthReady, setMonthReady] = useState(false);
   const navigate = useNavigate();
 
-  // Game constants
-  const MIN_SAVINGS_RATE = 0.2;         // 20%
-  const MEAL_COST = 5;                  // assumed cost per meal
-  const MIN_MEALS = 25;                 // required meals per month
+  // Game constants - loaded from config
+  const MIN_SAVINGS_RATE = gameConfig?.minSavingsRate ?? 0.2;
+  const MEAL_COST = gameConfig?.mealCost ?? 5;
+  const MIN_MEALS = gameConfig?.minMeals ?? 25;
   const MIN_FOOD = MIN_MEALS * MEAL_COST;
 
-  const MIN_ELECTRICITY = 20;
-  const MIN_WATER = 15;
-  const MIN_GAS = 15;
-  const MIN_PLAY_BUDGET = 500;
+  const MIN_ELECTRICITY = gameConfig?.minElectricit ?? 20;
+  const MIN_WATER = gameConfig?.minWater ?? 15;
+  const MIN_GAS = gameConfig?.minGas ?? 15;
+  const MIN_PLAY_BUDGET = gameConfig?.minPlayBudget;
+  const PRIZE_POCKET_MONEY = gameConfig?.prizePocketMoney ?? 25;
 
   // Other categories can be 0 by default
   const [alloc, setAlloc] = useState({
@@ -115,8 +157,8 @@ export default function BudgetGame() {
       }
 
       try {
-        await patchJson(`${API_BASE_URL}/children/me/pocket`, { amount: 25 });
-        messages.push(`Prize added: ${format(25)} to pocket money.`);
+        await patchJson(`${API_BASE_URL}/children/me/pocket`, { amount: PRIZE_POCKET_MONEY });
+        messages.push(`Prize added: ${format(PRIZE_POCKET_MONEY)} to pocket money.`);
       } catch (e) {
         messages.push(`Failed to add prize: ${e.message}.`);
       }
@@ -177,6 +219,33 @@ export default function BudgetGame() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
+  // Load game configuration from API
+  useEffect(() => {
+    const loadGameConfig = async () => {
+      try {
+        setConfigLoading(true);
+        setConfigError('');
+
+        // Fetch active config from backend
+        const config = await budgetGameApi.getActiveConfig();
+        setGameConfig(config);
+
+        console.log('Loaded game config:', config);
+
+      } catch (error) {
+        console.error('Failed to load game config:', error);
+        setConfigError('Could not load game settings, using defaults');
+
+        // Fallback to hardcoded values if API fails
+        setGameConfig(FALLBACK_CONFIG);
+      } finally {
+        setConfigLoading(false);
+      }
+    };
+
+    loadGameConfig();
+  }, []);
+
   const setValue = (key, v) => {
     setAlloc((prev) => ({ ...prev, [key]: Math.max(0, Math.round(Number(v) || 0)) }));
   };
@@ -207,36 +276,73 @@ export default function BudgetGame() {
   };
 
   const runRandomEvent = (currentSavings) => {
-    // roll: 0.0-0.39 negative, 0.4-0.69 positive, 0.7-1.0 none
+    // Parse the event config JSON
+    let eventConfigData;
+    try {
+      eventConfigData = JSON.parse(gameConfig?.eventConfig || '{}');
+    } catch (e) {
+      console.error('Failed to parse event config:', e);
+      // Return neutral event if parsing fails
+      return {
+        type: 'none',
+        title: 'Error',
+        message: 'Could not load events',
+        after: currentSavings
+      };
+    }
+
+    const { negative, positive, neutral } = eventConfigData;
+
+    // Generate random number between 0 and 1
     const r = Math.random();
-    if (r < 0.4) {
-      const cost = Math.floor(30 + Math.random() * 70); // 30-100
-      const after = currentSavings - cost;
+
+    // Calculate probability thresholds
+    const negThreshold = negative?.probability || 0.4;
+    const posThreshold = negThreshold + (positive?.probability || 0.3);
+
+    // Determine which type of event happens
+    if (r < negThreshold && negative?.events) {
+      // Negative event (e.g., phone breaks)
+      const cost = Math.floor(
+        negative.minAmount + Math.random() * (negative.maxAmount - negative.minAmount)
+      );
+      const event = negative.events[Math.floor(Math.random() * negative.events.length)];
+
       return {
         type: 'negative',
         amount: cost,
-        after,
-        title: 'Oh no! Phone screen broke',
-        message: `Repair costs ${format(cost)}. It comes from your savings.`,
+        after: currentSavings - cost,
+        title: event.title,
+        message: event.message.replace('{amount}', format(cost))
       };
-    } else if (r < 0.7) {
-      const gift = Math.floor(10 + Math.random() * 50); // 10-60
-      const after = currentSavings + gift;
+
+    } else if (r < posThreshold && positive?.events) {
+      // Positive event (e.g., gift)
+      const bonus = Math.floor(
+        positive.minAmount + Math.random() * (positive.maxAmount - positive.minAmount)
+      );
+      const event = positive.events[Math.floor(Math.random() * positive.events.length)];
+
       return {
         type: 'positive',
-        amount: gift,
-        after,
-        title: 'Nice! Surprise gift',
-        message: `You received ${format(gift)}. Added to your savings!`,
+        amount: bonus,
+        after: currentSavings + bonus,
+        title: event.title,
+        message: event.message.replace('{amount}', format(bonus))
+      };
+
+    } else {
+      // Neutral event (nothing happens)
+      const event = neutral?.events?.[0] || { title: 'Quiet month', message: 'No surprises this month' };
+
+      return {
+        type: 'none',
+        amount: 0,
+        after: currentSavings,
+        title: event.title,
+        message: event.message
       };
     }
-    return {
-      type: 'none',
-      amount: 0,
-      after: currentSavings,
-      title: 'Quiet month',
-      message: 'No surprises this month.',
-    };
   };
 
   const onDone = async () => {
@@ -290,7 +396,7 @@ export default function BudgetGame() {
     }
   };
 
-  const disabled = loading || !!fetchError || !monthReady || budgetBelowPlayMin;
+  const disabled = loading || configLoading || !!fetchError || !monthReady || budgetBelowPlayMin;
   const modalImage =
     modal.result === 'win'
       ? '/images/games-win.png'
@@ -307,6 +413,18 @@ export default function BudgetGame() {
         <div className="backdrop-blur-md bg-white/70 rounded-2xl shadow-lg p-6 sm:p-8">
           <h1 className="text-3xl font-extrabold text-blue-700">Monthly Budget Game</h1>
           <p className="text-slate-700 mt-2">Plan your month, cover essentials, and save at least 20% to win.</p>
+
+          {configLoading && (
+            <div className="mt-6 p-4 bg-blue-100 border border-blue-300 text-blue-900 rounded-xl">
+              Loading game settings...
+            </div>
+          )}
+
+          {configError && (
+            <div className="mt-6 p-4 bg-amber-100 border border-amber-300 text-amber-900 rounded-xl">
+              ⚠️ {configError}
+            </div>
+          )}
 
           {!isAuthenticated && (
             <div className="mt-6 p-4 bg-amber-100 border border-amber-300 text-amber-900 rounded-xl">
