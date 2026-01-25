@@ -13,43 +13,48 @@ import { useNavigate } from 'react-router';
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 // Fallback config with original hardcoded values
-// const FALLBACK_CONFIG = {
-//   minSavingsRate: 0.2,
-//   mealCost: 5,
-//   minMeals: 25,
-//   minElectricity: 20,
-//   minWater: 15,
-//   minGas: 15,
-//   minPlayBudget: 500,
-//   prizePocketMoney: 25,
-//   eventConfig: JSON.stringify({
-//     negative: {
-//       probability: 0.4,
-//       minAmount: 30,
-//       maxAmount: 100,
-//       events: [
-//         { title: "Phone screen broke", message: "Repair costs €{amount}" },
-//         { title: "Unexpected bill", message: "Pay €{amount} for fees" }
-//       ]
-//     },
-//     positive: {
-//       probability: 0.3,
-//       minAmount: 10,
-//       maxAmount: 60,
-//       events: [
-//         { title: "Surprise gift", message: "You received €{amount}!" }
-//       ]
-//     },
-//     neutral: {
-//       probability: 0.3,
-//       events: [
+const FALLBACK_CONFIG = {
+  minSavingsRate: 0.2,
+  mealCost: 5,
+  minMeals: 25,
+  minElectricity: 20,
+  minWater: 15,
+  minGas: 15,
+  minPlayBudget: 500,
+  prizePocketMoney: 25,
+  eventConfig: JSON.stringify({
+    negative: {
+      probability: 0.4,
+      minAmount: 30,
+      maxAmount: 100,
+      events: [
+        { title: "Phone screen broke", message: "Repair costs €{amount}" },
+        { title: "Unexpected bill", message: "Pay €{amount} for fees" }
+      ]
+    },
+    positive: {
+      probability: 0.3,
+      minAmount: 10,
+      maxAmount: 60,
+      events: [
+        { title: "Surprise gift", message: "You received €{amount}!" }
+      ]
+    },
+    neutral: {
+      probability: 0.3,
+      events: [
+        { title: "Quiet month", message: "No surprises this month" }
+      ]
+    }
+  })
+};
 //         { title: "Quiet month", message: "No surprises this month" }
 //       ]
 //     }
 //   })
 // };
 
-export default function BudgetGame() {
+export default function BudgetGame({ testMode = false, testConfig = null }) {
   const { authFetch, isAuthenticated } = useUser();
 
   // UI state
@@ -169,6 +174,35 @@ export default function BudgetGame() {
 
   // Fetch child balance and prepare budget
   const loadBudget = async () => {
+    // In test mode, skip authentication and use test budget
+    if (testMode) {
+      setLoading(true);
+      setFetchError('');
+      try {
+        // Use the min play budget from the test config as the starting budget
+        const testBudget = testConfig?.minPlayBudget || 500;
+        setStartingBudget(testBudget);
+
+        setAlloc({
+          food: MIN_FOOD,
+          electricity: MIN_ELECTRICITY,
+          water: MIN_WATER,
+          gas: MIN_GAS,
+          transportation: 0,
+          clothing: 0,
+          entertainment: 0,
+          misc: 0,
+        });
+        setMonthReady(true);
+      } catch (e) {
+        setFetchError(e?.message || 'Failed to load test budget');
+        setMonthReady(false);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     if (!isAuthenticated) {
       setFetchError('Please log in to play the game.');
       setLoading(false);
@@ -219,12 +253,18 @@ export default function BudgetGame() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
-  // Load game configuration from API
   useEffect(() => {
     const loadGameConfig = async () => {
       try {
         setConfigLoading(true);
         setConfigError('');
+
+        // If in test mode, use the test config provided
+        if (testMode && testConfig) {
+          setGameConfig(testConfig);
+          console.log('Loaded test config:', testConfig);
+          return;
+        }
 
         // Fetch active config from backend
         const config = await budgetGameApi.getActiveConfig();
@@ -244,7 +284,7 @@ export default function BudgetGame() {
     };
 
     loadGameConfig();
-  }, []);
+  }, [testMode, testConfig]);
 
   const setValue = (key, v) => {
     setAlloc((prev) => ({ ...prev, [key]: Math.max(0, Math.round(Number(v) || 0)) }));
