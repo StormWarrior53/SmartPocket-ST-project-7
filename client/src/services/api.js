@@ -162,4 +162,41 @@ export const quizApi = {
         }),
 };
 
+// Budget Game Configuration API
+export const budgetGameApi = {
+    /**
+     * Get the currently active game configuration
+     * Called by BudgetGame.jsx when the game loads
+     */
+    getActiveConfig: () =>
+        apiRequest('/budget-game-config/active', { method: 'GET' }),
+
+    /**
+     * Admin functions - for the admin panel
+     */
+    getAllConfigs: () =>
+        apiRequest('/budget-game-configs', { method: 'GET' }),
+
+    getConfigById: (id) =>
+        apiRequest(`/budget-game-configs/${id}`, { method: 'GET' }),
+
+    createConfig: (data) =>
+        apiRequest('/budget-game-configs', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+
+    updateConfig: (id, data) =>
+        apiRequest(`/budget-game-configs/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        }),
+
+    deleteConfig: (id) =>
+        apiRequest(`/budget-game-configs/${id}`, { method: 'DELETE' }),
+
+    setActiveConfig: (id) =>
+        apiRequest(`/budget-game-configs/${id}/activate`, { method: 'PATCH' }),
+};
+
 export { ApiError };
