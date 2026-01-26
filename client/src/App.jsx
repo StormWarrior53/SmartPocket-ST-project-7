@@ -22,6 +22,7 @@ import BudgetGame from "./components/budget-game/BudgetGame.jsx"
 import { useTokenExpiration } from './hooks/useTokenExpiration'
 import { setApiLogoutCallback } from './services/api'
 import { GoogleCallbackPage } from "./components/google-callback-page/GoogleCallbackPage.jsx"
+import TradePredictionGame from "./components/games/TradePredictionGame.jsx";
 
 function App() {
     const { handleExpiredToken } = useTokenExpiration(5); // 5-minute warning
@@ -53,6 +54,7 @@ function App() {
                 <Route path="/admin/quiz" element={<QuizAdmin />} />
                 <Route path="/admin/budget-game-config" element={<BudgetGameConfigAdmin />} />
                 <Route path="/quiz-history" element={<QuizHistory />} />
+                <Route path="/trade-prediction" element={<TradePredictionGame />} />
 
                 <Route path="/create-child" element={<CreateChild />} />
 
