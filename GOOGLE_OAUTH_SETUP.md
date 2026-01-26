@@ -78,7 +78,7 @@ This guide will help you configure Google OAuth login for the SmartPocket applic
 ```bash
 # Database Configuration (existing)
 DB_HOST=localhost
-DB_PORT=5432
+DB_PORT=5433
 DB_NAME=smartpocket
 DB_USERNAME=postgres
 DB_PASSWORD=your_password_here
