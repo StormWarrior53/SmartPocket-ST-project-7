@@ -15,12 +15,15 @@ import RoadmapDetails from "./components/roadmap-details/RoadmapDetails.jsx"
 import Games from "./components/games-page/Games.jsx"
 import Quiz from "./components/quiz-page/Quiz.jsx"
 import QuizAdmin from "./components/admin/QuizAdmin.jsx"
+import BudgetGameConfigAdmin from "./components/admin/BudgetGameConfigAdmin.jsx"
+import TradePredictionGameAdmin from "./components/admin/TradePredictionGameAdmin.jsx"
 import QuizHistory from "./components/quiz-history/QuizHistory.jsx"
 import CreateChild from "./components/create-child/CreateChild.jsx"
 import BudgetGame from "./components/budget-game/BudgetGame.jsx"
 import { useTokenExpiration } from './hooks/useTokenExpiration'
 import { setApiLogoutCallback } from './services/api'
 import { GoogleCallbackPage } from "./components/google-callback-page/GoogleCallbackPage.jsx"
+import TradePredictionGame from "./components/games/TradePredictionGame.jsx";
 
 function App() {
     const { handleExpiredToken } = useTokenExpiration(5); // 5-minute warning
@@ -50,7 +53,10 @@ function App() {
                 <Route path="budget-game" element={<BudgetGame />} />
                 <Route path="/quiz/:id" element={<Quiz />} />
                 <Route path="/admin/quiz" element={<QuizAdmin />} />
+                <Route path="/admin/budget-game-config" element={<BudgetGameConfigAdmin />} />
+                <Route path="/admin/trade-prediction" element={<TradePredictionGameAdmin />} />
                 <Route path="/quiz-history" element={<QuizHistory />} />
+                <Route path="/trade-prediction" element={<TradePredictionGame />} />
 
                 <Route path="/create-child" element={<CreateChild />} />
 

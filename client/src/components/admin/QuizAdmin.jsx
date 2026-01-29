@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import QuizForm from "./quiz-form/QuizForm.jsx";
 import QuizList from "./quiz-list/QuizList.jsx";
 import AttemptsModal from "./attempts-modal/AttemptsModal.jsx";
+import TestTradePredictionModal from "./TestTradePredictionModal.jsx";
 
 export default function QuizAdmin() {
     const [quizzes, setQuizzes] = useState([]);
@@ -15,6 +16,7 @@ export default function QuizAdmin() {
     const [editingQuizId, setEditingQuizId] = useState(null);
     const [viewingAttemptsQuizId, setViewingAttemptsQuizId] = useState(null);
     const [attempts, setAttempts] = useState([]);
+    const [testingTradePrediction, setTestingTradePrediction] = useState(false);
 
     const { user, isAuthenticated, loading: authLoading } = useUser();
     const navigate = useNavigate();
@@ -189,20 +191,28 @@ export default function QuizAdmin() {
     return (
         <div className="p-6 max-w-6xl mx-auto">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold">Quiz Management</h1>
-                <button
-                    onClick={() => {
-                        if (showCreateForm) {
-                            handleCancelForm();
-                        } else {
-                            setShowCreateForm(true);
-                            setEditingQuizId(null);
-                        }
-                    }}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                    {showCreateForm ? "Cancel" : "Create New Quiz"}
-                </button>
+                <h1 className="text-3xl font-bold">Admin Controls</h1>
+                <div className="flex gap-3">
+                    <button
+                        onClick={() => setTestingTradePrediction(true)}
+                        className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                    >
+                        Test Trade Prediction Game
+                    </button>
+                    <button
+                        onClick={() => {
+                            if (showCreateForm) {
+                                handleCancelForm();
+                            } else {
+                                setShowCreateForm(true);
+                                setEditingQuizId(null);
+                            }
+                        }}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        {showCreateForm ? "Cancel" : "Create New Quiz"}
+                    </button>
+                </div>
             </div>
 
             {error && (
@@ -231,6 +241,12 @@ export default function QuizAdmin() {
                 <AttemptsModal
                     attempts={attempts}
                     onClose={handleCloseAttempts}
+                />
+            )}
+
+            {testingTradePrediction && (
+                <TestTradePredictionModal
+                    onClose={() => setTestingTradePrediction(false)}
                 />
             )}
         </div>
